@@ -5,10 +5,6 @@
  */
 package com.viit.tnp.common;
 
-/**
- *
- * @author iraj
- */
 public class PersonalDetails {
 
     String email = "", mobileNo = "", firstName = "", middleName = "",

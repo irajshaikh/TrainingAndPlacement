@@ -1,6 +1,6 @@
 package com.viit.tnp.registration;
 
-import com.viit.tnp.MySqlConnect;
+import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.tpo.TPO;
 import java.sql.Connection;

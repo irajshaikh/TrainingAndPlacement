@@ -5,16 +5,33 @@
  */
 package com.viit.tnp.student;
 
-/**
- *
- * @author iraj
- */
 public class Student {
 
     int studentId, marksFirstYear, marksSecondYear, marksThirdYear, isActive,
             departmentId, personId;
+    String username, firstName;
     String date;
 
+    public Student(int personId, int marksFirstYear, int marksSecondYear, int marksThirdYear,
+            int isActive, int departmentId, String date) {
+        this.personId = personId;
+        this.marksFirstYear = marksFirstYear;
+        this.marksSecondYear = marksSecondYear;
+        this.marksThirdYear = marksThirdYear;
+        this.isActive = isActive;
+        this.departmentId = departmentId;
+        this.date = date;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    
     public Student(int marksFirstYear, int marksSecondYear, int marksThirdYear,
             int isActive, int departmentId, String date) {
         this.marksFirstYear = marksFirstYear;
@@ -23,6 +40,25 @@ public class Student {
         this.isActive = isActive;
         this.departmentId = departmentId;
         this.date = date;
+    }
+
+    public Student() {
+        
+    }
+    public int getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(int studentId) {
+        this.studentId = studentId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public int getMarksFirstYear() {

@@ -5,7 +5,7 @@
  */
 package com.viit.tnp.registration;
 
-import com.viit.tnp.MySqlConnect;
+import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.student.Student;
 import java.sql.Connection;
@@ -17,10 +17,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
-/**
- *
- * @author ali
- */
 public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
 
     /**

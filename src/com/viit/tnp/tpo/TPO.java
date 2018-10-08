@@ -5,13 +5,9 @@
  */
 package com.viit.tnp.tpo;
 
-/**
- *
- * @author iraj
- */
 public class TPO {
 
-    String designation, joiningDate;
+    String designation, joiningDate, username;
     int tpoId, personId, departmentId, salary;
 
     public TPO(String designation, String joiningDate, int departmentId, int salary) {
@@ -19,6 +15,14 @@ public class TPO {
         this.joiningDate = joiningDate;
         this.departmentId = departmentId;
         this.salary = salary;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getDesignation() {

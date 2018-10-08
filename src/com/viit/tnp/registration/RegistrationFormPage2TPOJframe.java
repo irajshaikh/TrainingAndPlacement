@@ -5,16 +5,12 @@
  */
 package com.viit.tnp.registration;
 
-import com.viit.tnp.MySqlConnect;
+import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.tpo.TPO;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 
-/**
- *
- * @author ali
- */
 public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
 
     PersonalDetails person;
@@ -59,7 +55,6 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jPanel2.setBackground(new java.awt.Color(36, 47, 65));
-        jPanel2.setForeground(null);
         jPanel2.setLayout(null);
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
@@ -70,7 +65,6 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
 
         jComboBox_desig.setBackground(new java.awt.Color(36, 47, 65));
         jComboBox_desig.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jComboBox_desig.setForeground(null);
         jComboBox_desig.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TPO Co-ordinator", "Assistant Co-ordinator" }));
         jComboBox_desig.setBorder(null);
         jPanel2.add(jComboBox_desig);
@@ -84,7 +78,7 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
 
         jTextField_salary.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_salary.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jTextField_salary.setForeground(null);
+        jTextField_salary.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_salary.setBorder(null);
         jPanel2.add(jTextField_salary);
         jTextField_salary.setBounds(210, 170, 190, 30);
@@ -107,7 +101,6 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
 
         jComboBox_dep.setBackground(new java.awt.Color(36, 47, 65));
         jComboBox_dep.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jComboBox_dep.setForeground(null);
         jComboBox_dep.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Civil", "Computer", "E&TC", "IT", "Mechanical" }));
         jComboBox_dep.setBorder(null);
         jPanel2.add(jComboBox_dep);

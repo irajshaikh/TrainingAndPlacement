@@ -1,9 +1,9 @@
 package com.viit.tnp.login;
 
-import com.viit.tnp.MySqlConnect;
+import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.registration.RegistrationFormPage1Jframe;
-import com.viit.tnp.StudentFileJframe;
-import com.viit.tnp.TPOFileJframe;
+import com.viit.tnp.student.StudentHomePageJframe;
+import com.viit.tnp.tpo.TPOHomePageJframe;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -79,7 +79,7 @@ public class LoginJframe extends javax.swing.JFrame {
         jLabel1.setText("Username:");
 
         jTextField_username.setBackground(new java.awt.Color(36, 47, 65));
-        jTextField_username.setFont(new java.awt.Font("Ubuntu", 0, 16)); // NOI18N
+        jTextField_username.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_username.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_username.setBorder(null);
 
@@ -88,6 +88,7 @@ public class LoginJframe extends javax.swing.JFrame {
         jLabel2.setText("Password:");
 
         jPasswordField_password.setBackground(new java.awt.Color(36, 47, 65));
+        jPasswordField_password.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jPasswordField_password.setForeground(new java.awt.Color(255, 255, 255));
         jPasswordField_password.setBorder(null);
 
@@ -267,7 +268,7 @@ public class LoginJframe extends javax.swing.JFrame {
                 if (jComboBox_option.getSelectedItem() == "TPO") {
                     if (rs.getInt(3) == 1) {
                         this.dispose();
-                        new TPOFileJframe(jTextField_username.getText()).setVisible(true);
+                        new TPOHomePageJframe(jTextField_username.getText()).setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "You're not a TPO!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -275,7 +276,7 @@ public class LoginJframe extends javax.swing.JFrame {
                 } else if (jComboBox_option.getSelectedItem() == "Student") {
                     if (rs.getInt(3) == 0) {
                         this.dispose();
-                        new StudentFileJframe(jTextField_username.getText()).setVisible(true);
+                        new StudentHomePageJframe(jTextField_username.getText()).setVisible(true);
                     } else {
                         JOptionPane.showMessageDialog(null, "You're not a student!", "Error", JOptionPane.ERROR_MESSAGE);
                     }
