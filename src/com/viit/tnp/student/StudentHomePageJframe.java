@@ -30,6 +30,7 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
 
     public StudentHomePageJframe(String username) throws SQLException {
         initComponents();
+        jTable_schedule.getTableHeader().setReorderingAllowed(false);
         this.username = username;
 
         String getStudentDetailsQuery = "select * from student_login_view where"
@@ -39,8 +40,23 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
             rs = MySqlConnect.executeSelectSQlQuery(getStudentDetailsQuery);
             rs.next();
             studentId = rs.getInt(1);
+            studentIdValue.setText(studentId +"");
             departmentId = rs.getInt(6);
             personId = rs.getInt(7);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+        String getDepartmentNameQuery = "select dep_name from department where"
+                + " d_id='" + departmentId + "'";
+        rs = null;
+        try {
+            rs = MySqlConnect.executeSelectSQlQuery(getDepartmentNameQuery);
+            rs.next();
+            
+            String departmentName = rs.getString("dep_name");
+            departIdValue.setText(departmentName);
+
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
         }
@@ -57,11 +73,11 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
         ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
 
         String getStudentRegisteredSchedules = "select * from "
-                + "schedule_company_view,TPO, appearing where TPO.d_id= '"
+                + "schedule_company_view,TPO,appearing where TPO.d_id= '"
                 + departmentId + "' and active=1 "
-                + "and TPO.tpo_id = schedule_company_view.tpo_id"
-                + "and appearing.stud_id=" + studentId
-                + "and appearing.sch_id=schedule_company_view.sch_id";
+                + " and TPO.tpo_id = schedule_company_view.tpo_id"
+                + " and appearing.stu_id=" + studentId
+                + " and appearing.sch_id=schedule_company_view.sch_id";
 
         ResultSet rs;
 
@@ -80,6 +96,12 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
             e.printStackTrace();
         }
         return scheduleList;
+    }
+
+    public void hideScheduleTable() {
+        scrollPaneScheduleTable.setVisible(false);
+        panelWelcome.setVisible(true);
+        labelTitle.setText("Welcome " + username + "!");
     }
 
     public void showScheduleTable() {
@@ -123,6 +145,10 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
         scrollPaneScheduleTable = new javax.swing.JScrollPane();
         jTable_schedule = new javax.swing.JTable();
+        labelDepartmentId = new javax.swing.JLabel();
+        labelStudentId = new javax.swing.JLabel();
+        studentIdValue = new javax.swing.JLabel();
+        departIdValue = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         menuItemRegisteredSchedule = new javax.swing.JMenuItem();
@@ -130,9 +156,9 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         menuItemEditProfile = new javax.swing.JMenuItem();
         jMenu3 = new javax.swing.JMenu();
-        menuItemLogout = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Home");
         setBackground(new java.awt.Color(36, 47, 65));
         setForeground(new java.awt.Color(36, 47, 65));
 
@@ -175,6 +201,7 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
                 "Schedule ID", "Schedule Date", "Company ID", "Company Name", "Criteria", "Minimum Salary"
             }
         ));
+        jTable_schedule.setRowSelectionAllowed(false);
         scrollPaneScheduleTable.setViewportView(jTable_schedule);
 
         jLayeredPane1.setLayer(panelWelcome, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -207,25 +234,65 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
                     .addContainerGap(89, Short.MAX_VALUE)))
         );
 
+        labelDepartmentId.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        labelDepartmentId.setForeground(new java.awt.Color(247, 237, 237));
+        labelDepartmentId.setText("Department :");
+
+        labelStudentId.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        labelStudentId.setForeground(new java.awt.Color(247, 228, 228));
+        labelStudentId.setText("Student id :");
+
+        studentIdValue.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        studentIdValue.setForeground(new java.awt.Color(234, 205, 205));
+        studentIdValue.setText("stu_id");
+
+        departIdValue.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        departIdValue.setForeground(new java.awt.Color(206, 184, 184));
+        departIdValue.setText("dept_Name");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(69, 69, 69)
-                        .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(27, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(69, 69, 69)
+                                .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(labelDepartmentId, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(labelStudentId)))
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(studentIdValue)
+                            .addComponent(departIdValue))
+                        .addGap(82, 82, 82)))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(43, 43, 43)
-                .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(68, 68, 68)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(departIdValue)
+                            .addComponent(labelDepartmentId)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(labelStudentId)
+                            .addComponent(studentIdValue, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -233,6 +300,7 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
 
         menuBar.setBackground(new java.awt.Color(97, 212, 195));
         menuBar.setForeground(new java.awt.Color(36, 47, 65));
+        menuBar.setPreferredSize(new java.awt.Dimension(205, 50));
 
         jMenu1.setForeground(new java.awt.Color(36, 47, 65));
         jMenu1.setText("Schedule");
@@ -269,17 +337,12 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
         menuBar.add(jMenu2);
 
         jMenu3.setForeground(new java.awt.Color(36, 47, 65));
-        jMenu3.setText("More..");
-
-        menuItemLogout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemLogout.setText("Logout");
-        menuItemLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemLogoutActionPerformed(evt);
+        jMenu3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logoutButton.gif"))); // NOI18N
+        jMenu3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu3MouseClicked(evt);
             }
         });
-        jMenu3.add(menuItemLogout);
-
         menuBar.add(jMenu3);
 
         setJMenuBar(menuBar);
@@ -288,15 +351,13 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 2, Short.MAX_VALUE))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
 
         pack();
@@ -308,6 +369,7 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemRegisteredScheduleActionPerformed
 
     private void menuItemEditProfileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemEditProfileActionPerformed
+        hideScheduleTable();
         try {
             new EditProfileJframe(personId).setVisible(true);
         } catch (SQLException ex) {
@@ -316,18 +378,25 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
     }//GEN-LAST:event_menuItemEditProfileActionPerformed
 
     private void menuItemRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemRegisterActionPerformed
+        hideScheduleTable();
+
         new ScheduleRegistrationJFrame(studentId, departmentId).setVisible(true);
         this.setVisible(true);
     }//GEN-LAST:event_menuItemRegisterActionPerformed
 
-    private void menuItemLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLogoutActionPerformed
+    private void jMenu3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu3MouseClicked
+        // TODO add your handling code here:
+        logout();
+    }//GEN-LAST:event_jMenu3MouseClicked
+
+    public void logout() {
         this.dispose();
         try {
             new LoginJframe().setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(StudentHomePageJframe.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_menuItemLogoutActionPerformed
+    }
 
     /**
      * @param args the command line arguments
@@ -371,6 +440,7 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel departIdValue;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JMenu jMenu1;
@@ -378,13 +448,15 @@ public class StudentHomePageJframe extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JTable jTable_schedule;
+    private javax.swing.JLabel labelDepartmentId;
+    private javax.swing.JLabel labelStudentId;
     private javax.swing.JLabel labelTitle;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem menuItemEditProfile;
-    private javax.swing.JMenuItem menuItemLogout;
     private javax.swing.JMenuItem menuItemRegister;
     private javax.swing.JMenuItem menuItemRegisteredSchedule;
     private javax.swing.JPanel panelWelcome;
     private javax.swing.JScrollPane scrollPaneScheduleTable;
+    private javax.swing.JLabel studentIdValue;
     // End of variables declaration//GEN-END:variables
 }

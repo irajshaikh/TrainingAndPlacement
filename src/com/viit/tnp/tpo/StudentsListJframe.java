@@ -28,6 +28,7 @@ public class StudentsListJframe extends javax.swing.JFrame {
 
     public StudentsListJframe(Integer tpo) {
         initComponents();
+        jTable_studentInfo.getTableHeader().setReorderingAllowed(false);
         setDefaultCloseOperation(StudentsListJframe.HIDE_ON_CLOSE);
         tpo_id = tpo;
         String Sql = "select d_id from TPO where tpo_id='" + tpo_id + "'";
@@ -62,7 +63,7 @@ public class StudentsListJframe extends javax.swing.JFrame {
                 user.setMarksSecondYear(rs.getInt("SE"));
                 user.setMarksThirdYear(rs.getInt("TE"));
                 user.setUsername(rs.getString("username"));
-                user.setDate(rs.getDate("academic_year").toString());
+                user.setAcademicYear(rs.getInt("academic_year"));
                 user.setFirstName(rs.getString("fname"));
                 user.setStudentId(rs.getInt("stu_id"));
 
@@ -86,7 +87,7 @@ public class StudentsListJframe extends javax.swing.JFrame {
             row[3] = list1.get(i).getMarksSecondYear();
             row[4] = list1.get(i).getMarksThirdYear();
             row[5] = list1.get(i).getUsername();
-            row[6] = list1.get(i).getDate();
+            row[6] = list1.get(i).getAcademicYear();
 
             model.addRow(row);
         }

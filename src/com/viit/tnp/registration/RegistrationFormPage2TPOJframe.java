@@ -5,24 +5,24 @@
  */
 package com.viit.tnp.registration;
 
+import com.viit.tnp.common.CommonUtils;
 import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.tpo.TPO;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
+import javax.swing.DefaultComboBoxModel;
 
 public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
 
     PersonalDetails person;
     Connection conn = MySqlConnect.getConnection();
+    DefaultComboBoxModel comboModel;
 
     public RegistrationFormPage2TPOJframe(PersonalDetails person) {
+        comboModel = new DefaultComboBoxModel(CommonUtils.getDepartmentsList());
         initComponents();
         this.person = person;
-    }
-
-    public RegistrationFormPage2TPOJframe() {
-        initComponents();
     }
 
     /**
@@ -63,12 +63,11 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         jPanel2.add(jLabel2);
         jLabel2.setBounds(50, 80, 122, 22);
 
-        jComboBox_desig.setBackground(new java.awt.Color(36, 47, 65));
         jComboBox_desig.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jComboBox_desig.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TPO Co-ordinator", "Assistant Co-ordinator" }));
         jComboBox_desig.setBorder(null);
         jPanel2.add(jComboBox_desig);
-        jComboBox_desig.setBounds(210, 70, 237, 40);
+        jComboBox_desig.setBounds(210, 80, 237, 32);
 
         jLabel3.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
@@ -80,6 +79,7 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         jTextField_salary.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_salary.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_salary.setBorder(null);
+        jTextField_salary.setCaretColor(java.awt.Color.white);
         jPanel2.add(jTextField_salary);
         jTextField_salary.setBounds(210, 170, 190, 30);
 
@@ -99,9 +99,8 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         jPanel2.add(jLabel5);
         jLabel5.setBounds(50, 340, 119, 22);
 
-        jComboBox_dep.setBackground(new java.awt.Color(36, 47, 65));
         jComboBox_dep.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jComboBox_dep.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Civil", "Computer", "E&TC", "IT", "Mechanical" }));
+        jComboBox_dep.setModel(comboModel);
         jComboBox_dep.setBorder(null);
         jPanel2.add(jComboBox_dep);
         jComboBox_dep.setBounds(210, 340, 190, 30);
@@ -158,8 +157,7 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -172,26 +170,9 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         String date = formater.format(dateChooserCombo1.getSelectedDate().getTime());
 
         String selectedDepartment = jComboBox_dep.getSelectedItem().toString();
-        int departmentId = 0;
-        switch (selectedDepartment) {
-            case "Civil":
-                departmentId = 1002;
-                break;
-            case "Computer":
-                departmentId = 1001;
-                break;
-            case "E&TC":
-                departmentId = 1003;
-                break;
-            case "IT":
-                departmentId = 1004;
-                break;
-            case "Mechanical":
-                departmentId = 1005;
-                break;
-        }
+        int departmentId = CommonUtils.getDepartmentIdFromName(selectedDepartment);
 
-        TPO tpo = new TPO(jComboBox_desig.getSelectedItem().toString(), date, 
+        TPO tpo = new TPO(jComboBox_desig.getSelectedItem().toString(), date,
                 departmentId, Integer.parseInt(jTextField_salary.getText()));
         this.dispose();
         new RegistrationFormPage3Jframe("TPO", person, tpo, null).setVisible(true);
@@ -239,7 +220,6 @@ public class RegistrationFormPage2TPOJframe extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new RegistrationFormPage2TPOJframe().setVisible(true);
             }
         });
     }

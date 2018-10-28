@@ -5,10 +5,14 @@
  */
 package com.viit.tnp.tpo;
 
+import com.viit.tnp.common.CommonUtils;
 import com.viit.tnp.common.MySqlConnect;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.Vector;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 public class CreateScheduleJframe extends javax.swing.JFrame {
@@ -20,14 +24,18 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
     int comp;
     String company;
     Connection conn = MySqlConnect.getConnection();
-    
+    DefaultComboBoxModel comboModel;
+
     public CreateScheduleJframe(int tpoId) {
+        getCompaniesList();
         initComponents();
         setDefaultCloseOperation(CreateScheduleJframe.HIDE_ON_CLOSE);
         this.tpoId = tpoId;
         jLabelTpoId.setText(this.tpoId + "");
+        labelSalaryError.setVisible(false);
+        labelMarksError.setVisible(false);
     }
-    
+
     public void executeSQlQuery(String query, String message) {
         Statement st;
         try {
@@ -56,20 +64,22 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         dateChooserCombo1 = new datechooser.beans.DateChooserCombo();
         jLabel4 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
+        jTextFieldMarks = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         jComboBox1 = new javax.swing.JComboBox<>();
         jLabel6 = new javax.swing.JLabel();
-        jTextField5 = new javax.swing.JTextField();
+        jTextFieldMinSalary = new javax.swing.JTextField();
         jLabel7 = new javax.swing.JLabel();
-        jTextField6 = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
         createButtonPanel = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabelTpoId = new javax.swing.JLabel();
-        jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
+        companyName = new javax.swing.JComboBox<>();
+        jLabel12 = new javax.swing.JLabel();
+        labelSalaryError = new javax.swing.JLabel();
+        labelMarksError = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -102,17 +112,18 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
         jPanel3.add(jLabel4);
         jLabel4.setBounds(50, 130, 160, 22);
 
-        jTextField3.setBackground(new java.awt.Color(36, 47, 65));
-        jTextField3.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jTextField3.setForeground(java.awt.Color.white);
-        jTextField3.setBorder(null);
-        jTextField3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField3ActionPerformed(evt);
+        jTextFieldMarks.setBackground(new java.awt.Color(36, 47, 65));
+        jTextFieldMarks.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jTextFieldMarks.setForeground(java.awt.Color.white);
+        jTextFieldMarks.setBorder(null);
+        jTextFieldMarks.setCaretColor(java.awt.Color.white);
+        jTextFieldMarks.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextFieldMarksKeyReleased(evt);
             }
         });
-        jPanel3.add(jTextField3);
-        jTextField3.setBounds(290, 130, 210, 30);
+        jPanel3.add(jTextFieldMarks);
+        jTextFieldMarks.setBounds(290, 130, 60, 30);
 
         jLabel5.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -120,10 +131,8 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
         jPanel3.add(jLabel5);
         jLabel5.setBounds(50, 200, 149, 22);
 
-        jComboBox1.setBackground(new java.awt.Color(36, 47, 65));
         jComboBox1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jComboBox1.setForeground(java.awt.Color.white);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026", "2027", "2028", "2029", "2030" }));
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2016", "2017", "2018", "2019", "2020" }));
         jComboBox1.setBorder(null);
         jPanel3.add(jComboBox1);
         jComboBox1.setBounds(290, 200, 210, 30);
@@ -134,30 +143,24 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
         jPanel3.add(jLabel6);
         jLabel6.setBounds(50, 260, 161, 22);
 
-        jTextField5.setBackground(new java.awt.Color(36, 47, 65));
-        jTextField5.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jTextField5.setForeground(java.awt.Color.white);
-        jTextField5.setBorder(null);
-        jTextField5.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField5ActionPerformed(evt);
+        jTextFieldMinSalary.setBackground(new java.awt.Color(36, 47, 65));
+        jTextFieldMinSalary.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jTextFieldMinSalary.setForeground(java.awt.Color.white);
+        jTextFieldMinSalary.setBorder(null);
+        jTextFieldMinSalary.setCaretColor(java.awt.Color.white);
+        jTextFieldMinSalary.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextFieldMinSalaryKeyReleased(evt);
             }
         });
-        jPanel3.add(jTextField5);
-        jTextField5.setBounds(290, 260, 210, 30);
+        jPanel3.add(jTextFieldMinSalary);
+        jTextFieldMinSalary.setBounds(290, 260, 210, 30);
 
         jLabel7.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("Company ID :");
+        jLabel7.setText("Company :");
         jPanel3.add(jLabel7);
-        jLabel7.setBounds(50, 310, 122, 22);
-
-        jTextField6.setBackground(new java.awt.Color(36, 47, 65));
-        jTextField6.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jTextField6.setForeground(java.awt.Color.white);
-        jTextField6.setBorder(null);
-        jPanel3.add(jTextField6);
-        jTextField6.setBounds(290, 310, 210, 30);
+        jLabel7.setBounds(50, 340, 96, 22);
 
         jLabel8.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -203,23 +206,41 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
         jPanel3.add(jLabelTpoId);
         jLabelTpoId.setBounds(290, 20, 90, 40);
 
-        jSeparator2.setBackground(new java.awt.Color(36, 47, 65));
-        jSeparator2.setForeground(new java.awt.Color(255, 255, 255));
-        jSeparator2.setBorder(null);
-        jPanel3.add(jSeparator2);
-        jSeparator2.setBounds(290, 340, 210, 10);
-
         jSeparator3.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator3.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator3.setBorder(null);
         jPanel3.add(jSeparator3);
-        jSeparator3.setBounds(290, 160, 210, 10);
+        jSeparator3.setBounds(290, 160, 60, 10);
 
         jSeparator4.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator4.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator4.setBorder(null);
         jPanel3.add(jSeparator4);
         jSeparator4.setBounds(290, 290, 210, 10);
+
+        companyName.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        companyName.setModel(comboModel);
+        companyName.setBorder(null);
+        jPanel3.add(companyName);
+        companyName.setBounds(290, 340, 180, 32);
+
+        jLabel12.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jLabel12.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel12.setText("/ 10");
+        jPanel3.add(jLabel12);
+        jLabel12.setBounds(360, 130, 40, 30);
+
+        labelSalaryError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelSalaryError.setForeground(new java.awt.Color(230, 49, 29));
+        labelSalaryError.setText("minSalaryError");
+        jPanel3.add(labelSalaryError);
+        labelSalaryError.setBounds(270, 300, 270, 21);
+
+        labelMarksError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelMarksError.setForeground(new java.awt.Color(230, 49, 29));
+        labelMarksError.setText("marksError");
+        jPanel3.add(labelMarksError);
+        labelMarksError.setBounds(270, 170, 270, 21);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -236,33 +257,103 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+    public void getCompaniesList() {
 
-    private void jTextField3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField3ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField3ActionPerformed
+        String query1 = "select distinct(co_name) from company";
 
-    private void jTextField5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField5ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField5ActionPerformed
+        Statement st;
+        ResultSet rs;
+        Vector companyNames = new Vector();
 
-    private void createButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createButtonPanelMouseClicked
+        try {
+            st = conn.createStatement();
+            rs = st.executeQuery(query1);
+
+            while (rs.next()) {
+                companyNames.add(rs.getString("co_name"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        comboModel = new DefaultComboBoxModel(companyNames);
+    }
+
+    private void createSchedule() {
         SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd");
-        
+
         String date = formater.format(dateChooserCombo1.getSelectedDate().getTime());
         String query1 = "INSERT INTO `schedule`(`criteria`,`min_salary`,"
                 + "`sch_date`,`comp_id`,`tpo_id`,`acad_year`) VALUES ('"
-                + jTextField3.getText() + "','" + jTextField5.getText() + "','"
-                + date + "','" + jTextField6.getText() + "','"
+                + jTextFieldMarks.getText() + "','" + jTextFieldMinSalary.getText() + "','"
+                + date + "','" + CommonUtils.getComapnyIdFromName(companyName.getSelectedItem().toString()) + "','"
                 + tpoId + "','" + jComboBox1.getSelectedItem() + "')";
-        
+
         boolean scheduleCreated = MySqlConnect.executeUpdateSQlQuery(query1);
         if (scheduleCreated) {
             JOptionPane.showMessageDialog(null, "Schedule created");
+            this.dispose();
         } else {
             JOptionPane.showMessageDialog(null, "Schedule creation failed", "Error", JOptionPane.ERROR_MESSAGE);
-            
+
+        }
+    }
+    private void createButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_createButtonPanelMouseClicked
+        boolean isValidMarks = validateMarks();
+        boolean isValidSalary = validateMinSalary();
+        if (isValidMarks && isValidSalary) {
+            createSchedule();
         }
     }//GEN-LAST:event_createButtonPanelMouseClicked
+
+    boolean validateMarks() {
+        boolean isValid = true;
+        labelMarksError.setVisible(false);
+        String marksText = jTextFieldMarks.getText();
+        if (marksText.length() == 0) {
+            isValid = false;
+            labelMarksError.setText("Required");
+            labelMarksError.setVisible(true);
+        } else {
+            try {
+                float marks = Float.parseFloat(marksText);
+                if (marks < 0 || marks > 10) {
+                    labelMarksError.setText("Should be between 0 and 10");
+                    labelMarksError.setVisible(true);
+                }
+            } catch (Exception e) {
+                labelMarksError.setText("Should be a number");
+                labelMarksError.setVisible(true);
+            }
+        }
+        return isValid;
+    }
+
+    private boolean validateMinSalary() {
+        boolean isValid = true;
+        String salaryInput = jTextFieldMinSalary.getText();
+        labelSalaryError.setVisible(false);
+        if (salaryInput.length() != 0) {
+            try {
+                Integer.parseInt(salaryInput);
+            } catch (Exception e) {
+                isValid = false;
+                labelSalaryError.setVisible(true);
+                labelSalaryError.setText("Should be integer");
+            }
+        } else {
+            isValid = false;
+            labelSalaryError.setVisible(true);
+            labelSalaryError.setText("Required");
+        }
+        return isValid;
+    }
+    private void jTextFieldMinSalaryKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldMinSalaryKeyReleased
+        validateMinSalary();
+    }//GEN-LAST:event_jTextFieldMinSalaryKeyReleased
+
+    private void jTextFieldMarksKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldMarksKeyReleased
+        validateMarks();
+    }//GEN-LAST:event_jTextFieldMarksKeyReleased
 
     /**
      * @param args the command line arguments
@@ -302,28 +393,26 @@ public class CreateScheduleJframe extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> companyName;
     private javax.swing.JPanel createButtonPanel;
     private datechooser.beans.DateChooserCombo dateChooserCombo1;
     private javax.swing.JComboBox<String> jComboBox1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabelTpoId;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JTextField jTextField5;
-    private javax.swing.JTextField jTextField6;
-    private javax.swing.JPanel loginButtonPanel;
-    private javax.swing.JPanel loginButtonPanel1;
+    private javax.swing.JTextField jTextFieldMarks;
+    private javax.swing.JTextField jTextFieldMinSalary;
+    private javax.swing.JLabel labelMarksError;
+    private javax.swing.JLabel labelSalaryError;
     // End of variables declaration//GEN-END:variables
 }

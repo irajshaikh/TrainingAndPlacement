@@ -5,16 +5,14 @@
  */
 package com.viit.tnp.registration;
 
+import com.viit.tnp.common.CommonUtils;
 import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.student.Student;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 
 public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
@@ -24,15 +22,18 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
      */
     int pid;
     Connection conn = MySqlConnect.getConnection();
+    DefaultComboBoxModel comboModel;
+
     PersonalDetails personalDetails;
+    Student s = new Student();
 
     public RegistrationFormPage2StudentJframe(PersonalDetails personalDetails) {
+        comboModel = new DefaultComboBoxModel(CommonUtils.getDepartmentsList());
         initComponents();
         this.personalDetails = personalDetails;
-    }
-
-    public RegistrationFormPage2StudentJframe() {
-        initComponents();
+        labelMarksFEError.setVisible(false);
+        labelMarksSEError.setVisible(false);
+        labelMarksTEError.setVisible(false);
     }
 
     public void executeSQlQuery(String query, String message) {
@@ -60,7 +61,6 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
 
         jPanel2 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        dateChooserCombo1 = new datechooser.beans.DateChooserCombo();
         jLabel7 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
@@ -79,9 +79,14 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
+        dateChooser = new javax.swing.JComboBox<>();
+        labelMarksTEError = new javax.swing.JLabel();
+        labelMarksFEError = new javax.swing.JLabel();
+        labelMarksSEError = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Additional details");
 
         jPanel2.setBackground(new java.awt.Color(36, 47, 65));
         jPanel2.setLayout(null);
@@ -91,10 +96,6 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         jLabel2.setText("Academic Year:");
         jPanel2.add(jLabel2);
         jLabel2.setBounds(40, 40, 137, 22);
-
-        dateChooserCombo1.setCalendarPreferredSize(new java.awt.Dimension(350, 280));
-        jPanel2.add(dateChooserCombo1);
-        dateChooserCombo1.setBounds(240, 40, 168, 30);
 
         jLabel7.setFont(new java.awt.Font("Dialog", 1, 24)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
@@ -118,9 +119,10 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         fieldFEMarks.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldFEMarks.setForeground(java.awt.Color.white);
         fieldFEMarks.setBorder(null);
-        fieldFEMarks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fieldFEMarksActionPerformed(evt);
+        fieldFEMarks.setCaretColor(java.awt.Color.white);
+        fieldFEMarks.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                fieldFEMarksKeyReleased(evt);
             }
         });
         jPanel2.add(fieldFEMarks);
@@ -130,9 +132,10 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         fieldSEMarks.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldSEMarks.setForeground(java.awt.Color.white);
         fieldSEMarks.setBorder(null);
-        fieldSEMarks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fieldSEMarksActionPerformed(evt);
+        fieldSEMarks.setCaretColor(java.awt.Color.white);
+        fieldSEMarks.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                fieldSEMarksKeyReleased(evt);
             }
         });
         jPanel2.add(fieldSEMarks);
@@ -148,9 +151,10 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         fieldTEMarks.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldTEMarks.setForeground(java.awt.Color.white);
         fieldTEMarks.setBorder(null);
-        fieldTEMarks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fieldTEMarksActionPerformed(evt);
+        fieldTEMarks.setCaretColor(java.awt.Color.white);
+        fieldTEMarks.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                fieldTEMarksKeyReleased(evt);
             }
         });
         jPanel2.add(fieldTEMarks);
@@ -162,16 +166,9 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         jPanel2.add(jLabel6);
         jLabel6.setBounds(40, 130, 113, 22);
 
-        fieldDepartment.setBackground(new java.awt.Color(36, 47, 65));
         fieldDepartment.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        fieldDepartment.setForeground(java.awt.Color.white);
-        fieldDepartment.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Civil", "Computer", "E&TC", "IT", "Mechanical" }));
+        fieldDepartment.setModel(comboModel);
         fieldDepartment.setBorder(null);
-        fieldDepartment.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                fieldDepartmentActionPerformed(evt);
-            }
-        });
         jPanel2.add(fieldDepartment);
         fieldDepartment.setBounds(240, 130, 168, 30);
 
@@ -191,25 +188,25 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         nextButtonPanel.setLayout(nextButtonPanelLayout);
         nextButtonPanelLayout.setHorizontalGroup(
             nextButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(nextButtonPanelLayout.createSequentialGroup()
-                .addGap(23, 23, 23)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, nextButtonPanelLayout.createSequentialGroup()
+                .addContainerGap(30, Short.MAX_VALUE)
                 .addComponent(jLabel9)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addGap(26, 26, 26))
         );
         nextButtonPanelLayout.setVerticalGroup(
             nextButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, nextButtonPanelLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(nextButtonPanelLayout.createSequentialGroup()
+                .addContainerGap()
                 .addComponent(jLabel9)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel2.add(nextButtonPanel);
-        nextButtonPanel.setBounds(840, 400, 99, 45);
+        nextButtonPanel.setBounds(840, 450, 99, 45);
 
         jLabel8.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/regStepSideStudent.png"))); // NOI18N
         jPanel2.add(jLabel8);
-        jLabel8.setBounds(580, 60, 256, 256);
+        jLabel8.setBounds(700, 10, 256, 256);
         jPanel2.add(jSeparator4);
         jSeparator4.setBounds(240, 430, 50, 10);
         jPanel2.add(jSeparator5);
@@ -235,17 +232,37 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         jPanel2.add(jLabel12);
         jLabel12.setBounds(300, 330, 50, 30);
 
+        dateChooser.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        dateChooser.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2016", "2017", "2018", "2019", "2020" }));
+        jPanel2.add(dateChooser);
+        dateChooser.setBounds(240, 40, 170, 32);
+
+        labelMarksTEError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelMarksTEError.setForeground(new java.awt.Color(230, 49, 29));
+        labelMarksTEError.setText("marksTEError");
+        jPanel2.add(labelMarksTEError);
+        labelMarksTEError.setBounds(350, 400, 270, 30);
+
+        labelMarksFEError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelMarksFEError.setForeground(new java.awt.Color(230, 49, 29));
+        labelMarksFEError.setText("marksFEError");
+        jPanel2.add(labelMarksFEError);
+        labelMarksFEError.setBounds(350, 270, 270, 21);
+
+        labelMarksSEError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelMarksSEError.setForeground(new java.awt.Color(230, 49, 29));
+        labelMarksSEError.setText("marksSEError");
+        jPanel2.add(labelMarksSEError);
+        labelMarksSEError.setBounds(350, 330, 270, 30);
+
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/regStep2Top.png"))); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(0, 256, Short.MAX_VALUE))
+            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -253,57 +270,23 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
                 .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 473, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(49, 49, 49))
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 510, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void fieldFEMarksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldFEMarksActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldFEMarksActionPerformed
-
-    private void fieldSEMarksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldSEMarksActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldSEMarksActionPerformed
-
-    private void fieldTEMarksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldTEMarksActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldTEMarksActionPerformed
-
-    private void fieldDepartmentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldDepartmentActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldDepartmentActionPerformed
-
     private void saveAndNext() {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-        String date = formatter.format(dateChooserCombo1.getSelectedDate().getTime());
 
+        int date = Integer.parseInt(dateChooser.getSelectedItem().toString());
         String selectedDepartment = fieldDepartment.getSelectedItem().toString();
-        int departmentId = 0;
-        switch (selectedDepartment) {
-            case "Civil":
-                departmentId = 1002;
-                break;
-            case "Computer":
-                departmentId = 1001;
-                break;
-            case "E&TC":
-                departmentId = 1003;
-                break;
-            case "IT":
-                departmentId = 1004;
-                break;
-            case "Mechanical":
-                departmentId = 1005;
-                break;
-        }
-
-        int marksFirstYear = Integer.parseInt(fieldFEMarks.getText());
-        int marksSecondYear = Integer.parseInt(fieldSEMarks.getText());
-        int marksThirdYear = Integer.parseInt(fieldTEMarks.getText());
+        int departmentId = CommonUtils.getDepartmentIdFromName(selectedDepartment);
+        float marksFirstYear = Float.parseFloat(fieldFEMarks.getText());
+        float marksSecondYear = Float.parseFloat(fieldSEMarks.getText());
+        float marksThirdYear = Float.parseFloat(fieldTEMarks.getText());
         int isActive = 1;
 
         Student student = new Student(marksFirstYear, marksSecondYear,
@@ -313,8 +296,66 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
     }
 
     private void nextButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_nextButtonPanelMouseClicked
-        this.saveAndNext();
+        boolean isValidFEMarks = validateMarks(1);
+        boolean isValidSEMarks = validateMarks(2);
+        boolean isValidTEMarks = validateMarks(3);
+        if (isValidFEMarks && isValidSEMarks && isValidTEMarks) {
+            this.saveAndNext();
+        }
     }//GEN-LAST:event_nextButtonPanelMouseClicked
+
+    private void fieldFEMarksKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldFEMarksKeyReleased
+        validateMarks(1);
+    }//GEN-LAST:event_fieldFEMarksKeyReleased
+
+    private void fieldSEMarksKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldSEMarksKeyReleased
+        validateMarks(2);
+    }//GEN-LAST:event_fieldSEMarksKeyReleased
+
+    private void fieldTEMarksKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldTEMarksKeyReleased
+        validateMarks(3);
+    }//GEN-LAST:event_fieldTEMarksKeyReleased
+
+    boolean validateMarks(int year) {
+        boolean isValid = true;
+
+        javax.swing.JTextField fieldMarks = fieldFEMarks;
+        javax.swing.JLabel errorLabel = labelMarksFEError;
+
+        switch (year) {
+            case 1:
+                fieldMarks = fieldFEMarks;
+                errorLabel = labelMarksFEError;
+                break;
+            case 2:
+                fieldMarks = fieldSEMarks;
+                errorLabel = labelMarksSEError;
+                break;
+            case 3:
+                fieldMarks = fieldTEMarks;
+                errorLabel = labelMarksTEError;
+                break;
+        }
+        errorLabel.setVisible(false);
+        String marksText = fieldMarks.getText();
+        if (marksText.length() == 0) {
+            isValid = false;
+            errorLabel.setText("Required");
+            errorLabel.setVisible(true);
+        } else {
+            try {
+                float marks = Float.parseFloat(marksText);
+                if (marks < 0 || marks > 10) {
+                    errorLabel.setText("Should be between 0 and 10");
+                    errorLabel.setVisible(true);
+                }
+            } catch (Exception e) {
+                errorLabel.setText("Should be a number");
+                errorLabel.setVisible(true);
+            }
+        }
+        return isValid;
+    }
 
     /**
      * @param args the command line arguments
@@ -349,13 +390,12 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new RegistrationFormPage2StudentJframe().setVisible(true);
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private datechooser.beans.DateChooserCombo dateChooserCombo1;
+    private javax.swing.JComboBox<String> dateChooser;
     private javax.swing.JComboBox<String> fieldDepartment;
     private javax.swing.JTextField fieldFEMarks;
     private javax.swing.JTextField fieldSEMarks;
@@ -376,6 +416,9 @@ public class RegistrationFormPage2StudentJframe extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
+    private javax.swing.JLabel labelMarksFEError;
+    private javax.swing.JLabel labelMarksSEError;
+    private javax.swing.JLabel labelMarksTEError;
     private javax.swing.JPanel nextButtonPanel;
     // End of variables declaration//GEN-END:variables
 }

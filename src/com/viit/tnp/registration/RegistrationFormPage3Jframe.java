@@ -5,8 +5,12 @@ import com.viit.tnp.common.MySqlConnect;
 import com.viit.tnp.common.PersonalDetails;
 import com.viit.tnp.student.Student;
 import com.viit.tnp.tpo.TPO;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -75,7 +79,7 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
                 passwordErrorText = "<html>Password should contain at least<br>"
                         + "one uppercase letter,<br> one lowercase character <br>"
                         + "and minimum 6 characters</html>";
-            
+
             }
             labelPasswordError.setText(passwordErrorText);
 
@@ -179,39 +183,50 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
 
         jPanel3.setBackground(new java.awt.Color(36, 47, 65));
 
-        labelUsername.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        labelUsername.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         labelUsername.setForeground(new java.awt.Color(255, 255, 255));
         labelUsername.setText("Username : ");
 
         fieldUsername.setBackground(new java.awt.Color(36, 47, 65));
+        fieldUsername.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldUsername.setForeground(new java.awt.Color(255, 255, 255));
         fieldUsername.setBorder(null);
+        fieldUsername.setCaretColor(java.awt.Color.white);
+        fieldUsername.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fieldUsernameActionPerformed(evt);
+            }
+        });
         fieldUsername.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 fieldUsernameKeyReleased(evt);
             }
         });
 
-        labelPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        labelPassword.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         labelPassword.setForeground(new java.awt.Color(255, 255, 255));
         labelPassword.setText("Password : ");
 
         fieldPassword.setBackground(new java.awt.Color(36, 47, 65));
+        fieldPassword.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldPassword.setForeground(new java.awt.Color(255, 255, 255));
         fieldPassword.setBorder(null);
+        fieldPassword.setCaretColor(java.awt.Color.white);
         fieldPassword.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 fieldPasswordKeyReleased(evt);
             }
         });
 
-        labelConfirmPassword.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
+        labelConfirmPassword.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         labelConfirmPassword.setForeground(new java.awt.Color(255, 255, 255));
         labelConfirmPassword.setText("Re-enter password : ");
 
         fieldConfirmPassword.setBackground(new java.awt.Color(36, 47, 65));
+        fieldConfirmPassword.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         fieldConfirmPassword.setForeground(new java.awt.Color(255, 255, 255));
         fieldConfirmPassword.setBorder(null);
+        fieldConfirmPassword.setCaretColor(java.awt.Color.white);
         fieldConfirmPassword.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyReleased(java.awt.event.KeyEvent evt) {
                 fieldConfirmPasswordKeyReleased(evt);
@@ -266,64 +281,68 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(30, 30, 30)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(registerButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(labelConfirmPassword)
-                            .addComponent(labelPassword)
-                            .addComponent(labelUsername)
-                            .addComponent(fieldUsername)
-                            .addComponent(fieldConfirmPassword)
-                            .addComponent(jSeparator3)
-                            .addComponent(fieldPassword)
-                            .addComponent(jSeparator1)
-                            .addComponent(jSeparator2)
-                            .addComponent(labelUsernameError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(labelConfirmPasswordError, javax.swing.GroupLayout.DEFAULT_SIZE, 364, Short.MAX_VALUE)
-                            .addComponent(labelPasswordError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(59, 59, 59)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 567, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                        .addGap(30, 30, 30)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(registerButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(labelPassword)
+                                        .addComponent(labelUsername)
+                                        .addComponent(fieldUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(fieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jSeparator1)
+                                        .addComponent(jSeparator2)
+                                        .addComponent(labelUsernameError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(labelPasswordError, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                    .addComponent(labelConfirmPassword))
+                                .addGap(0, 0, Short.MAX_VALUE))))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelConfirmPasswordError, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(fieldConfirmPassword, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 364, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 535, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(59, 59, 59))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(labelUsername)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fieldUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelUsernameError)
-                .addGap(18, 18, 18)
-                .addComponent(labelPassword)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(5, 5, 5)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelPasswordError)
-                .addGap(39, 39, 39)
-                .addComponent(labelConfirmPassword)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(fieldConfirmPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelConfirmPasswordError)
-                .addGap(19, 19, 19)
-                .addComponent(registerButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(24, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(labelUsername)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fieldUsername, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelUsernameError)
+                        .addGap(18, 18, 18)
+                        .addComponent(labelPassword)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fieldPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(5, 5, 5)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 6, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelPasswordError)
+                        .addGap(36, 36, 36)
+                        .addComponent(labelConfirmPassword)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fieldConfirmPassword, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelConfirmPasswordError)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 66, Short.MAX_VALUE)
+                        .addComponent(registerButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -334,16 +353,15 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
@@ -376,12 +394,17 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
 
     private void fieldUsernameKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_fieldUsernameKeyReleased
         username = fieldUsername.getText();
+        personalDetails.setUsername(username);
         validateUsername();
     }//GEN-LAST:event_fieldUsernameKeyReleased
 
     private void registerButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registerButtonPanelMouseClicked
         registerUser();
     }//GEN-LAST:event_registerButtonPanelMouseClicked
+
+    private void fieldUsernameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldUsernameActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_fieldUsernameActionPerformed
 
     private void registerUser() {
 
@@ -415,14 +438,43 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
             boolean insertedIntoLogin = MySqlConnect.executeUpdateSQlQuery(insertIntoLoginQuery);
 
 //            Insert personalDetails into person table
-            String insertIntoPersonQuery = "INSERT INTO `person`(`p_id`,`fname`,`lname`,"
-                    + "`email`,`phone`,`gender`,`username`,`dob`) VALUES ('"
-                    + newPid + "','" + personalDetails.getFirstName() + "','"
-                    + personalDetails.getLastName() + "','"
-                    + personalDetails.getEmail() + "','" + personalDetails.getMobileNo() + "','"
-                    + personalDetails.getGender() + "','" + username + "','"
-                    + personalDetails.getDateOfBirth() + "')";
-            boolean insertedIntoPerson = MySqlConnect.executeUpdateSQlQuery(insertIntoPersonQuery);
+            String filePath = personalDetails.getAbsolutePathPhoto();
+            boolean hasPhoto = filePath != null && filePath.length() != 0;
+            String insertIntoPersonQuery = "";
+            if (hasPhoto) {
+                insertIntoPersonQuery = "INSERT INTO `person`(`p_id`,`fname`,`lname`,"
+                        + "`email`,`phone`,`gender`,`username`,`dob`, `photo`) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            } else {
+                insertIntoPersonQuery = "INSERT INTO `person`(`p_id`,`fname`,`lname`,"
+                        + "`email`,`phone`,`gender`,`username`,`dob`) "
+                        + "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            }
+
+            PreparedStatement pst = null;
+            boolean insertedIntoPerson = false;
+            try {
+                pst = conn.prepareStatement(insertIntoPersonQuery);
+                pst.setInt(1, newPid);
+                pst.setString(2, personalDetails.getFirstName());
+                pst.setString(3, personalDetails.getLastName());
+                pst.setString(4, personalDetails.getEmail());
+                pst.setString(5, personalDetails.getMobileNo());
+                pst.setString(6, personalDetails.getGender());
+                pst.setString(7, personalDetails.getUsername());
+                pst.setString(8, personalDetails.getDateOfBirth());
+
+//                Add photo to database
+                if (hasPhoto) {
+                    File imgfile = new File(personalDetails.getAbsolutePathPhoto());
+                    FileInputStream fin = new FileInputStream(imgfile);
+                    pst.setBinaryStream(9, (InputStream) fin, (int) imgfile.length());
+                }
+                insertedIntoPerson = pst.executeUpdate() > 0;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
             boolean insertedIntoTPO = false, insertedIntoStudent = false;
             if (registerAs.equals("TPO")) {
@@ -441,7 +493,7 @@ public final class RegistrationFormPage3Jframe extends javax.swing.JFrame {
                         + "`p_id`,`d_id`)VALUES('" + student.getMarksFirstYear()
                         + "','" + student.getMarksSecondYear() + "','"
                         + student.getMarksThirdYear() + "','"
-                        + student.getDate() + "','" + newPid + "','"
+                        + student.getAcademicYear() + "','" + newPid + "','"
                         + student.getDepartmentId() + "')";
                 insertedIntoStudent = MySqlConnect.executeUpdateSQlQuery(insertIntoStudentQuery);
 

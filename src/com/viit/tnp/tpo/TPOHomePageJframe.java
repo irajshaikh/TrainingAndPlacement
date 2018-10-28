@@ -7,10 +7,10 @@ package com.viit.tnp.tpo;
 
 import com.viit.tnp.alumni.AlumniJframe;
 import com.viit.tnp.company.Company;
-import com.viit.tnp.company.CompanyJframe;
+import com.viit.tnp.company.RegisterCompanyJframe;
 import com.viit.tnp.common.MySqlConnect;
-import com.viit.tnp.report.Report;
-import com.viit.tnp.report.ReportJframe;
+import com.viit.tnp.report.ReportDepartmentWiseJframe;
+import com.viit.tnp.report.ReportCompanywiseJframe;
 import com.viit.tnp.common.EditProfileJframe;
 import com.viit.tnp.login.LoginJframe;
 import java.io.IOException;
@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class TPOHomePageJframe extends javax.swing.JFrame {
@@ -36,12 +37,29 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         if (rs != null) {
             rs.next();
             tpoId = rs.getInt(2);
+            tpoIdValue.setText(tpoId + "");
             personId = rs.getInt(3);
         }
         setDefaultCloseOperation(TPOHomePageJframe.HIDE_ON_CLOSE);
         labelTitle.setText("Welcome " + username + "!");
-        panelTables.setVisible(false);
+        panelCompanyTable.setVisible(false);
+        panelScheduleTable.setVisible(false);
         labelWelcomeIcon.setVisible(true);
+
+        String getDepartmentNameQuery = "select dep_name from department,TPO where"
+                + " TPO.d_id=department.d_id and TPO.tpo_id=" + tpoId;
+        rs = null;
+        try {
+            rs = MySqlConnect.executeSelectSQlQuery(getDepartmentNameQuery);
+            rs.next();
+
+            String departmentName = rs.getString("dep_name");
+            departIdValue.setText(departmentName);
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+
     }
 
     public ArrayList<Company> getCompanyList() {
@@ -76,9 +94,9 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
 
         Object[] row = new Object[3];
         for (int i = 0; i < list.size(); i++) {
-            row[0] = list.get(i).getcompid();
-            row[1] = list.get(i).getcompname();
-            row[2] = list.get(i).gettype();
+            row[0] = list.get(i).getComp_id();
+            row[1] = list.get(i).getCompanyName();
+            row[2] = list.get(i).getType();
 
             model.addRow(row);
         }
@@ -136,19 +154,20 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPopupMenu1 = new javax.swing.JPopupMenu();
-        jPopupMenu2 = new javax.swing.JPopupMenu();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTable2 = new javax.swing.JTable();
         jPanel1 = new javax.swing.JPanel();
         jLayeredPane1 = new javax.swing.JLayeredPane();
-        panelTables = new javax.swing.JPanel();
+        panelCompanyTable = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable_company = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        jTable_schedule = new javax.swing.JTable();
         labelWelcomeIcon = new javax.swing.JLabel();
+        panelScheduleTable = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTable_schedule = new javax.swing.JTable();
         labelTitle = new javax.swing.JLabel();
+        tpoIdValue = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        departIdValue = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         menuCompany = new javax.swing.JMenu();
         menuItemCompanyDetail = new javax.swing.JMenuItem();
@@ -156,6 +175,7 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         menuSchedule = new javax.swing.JMenu();
         menuItemScheduleDetails = new javax.swing.JMenuItem();
         menuItemCreateSchedule = new javax.swing.JMenuItem();
+        menuItemDeleteSchedule = new javax.swing.JMenuItem();
         menuStudent = new javax.swing.JMenu();
         menuItemStudentDetails = new javax.swing.JMenuItem();
         jmenuItemRegisteredStudents = new javax.swing.JMenuItem();
@@ -168,27 +188,15 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         menuProfile = new javax.swing.JMenu();
         menuItemEdit = new javax.swing.JMenuItem();
         menuMore = new javax.swing.JMenu();
-        menuItemLogout = new javax.swing.JMenuItem();
-
-        jTable2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        jScrollPane2.setViewportView(jTable2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Home");
 
         jPanel1.setBackground(new java.awt.Color(37, 46, 65));
 
-        panelTables.setBackground(new java.awt.Color(37, 46, 65));
-        panelTables.setLayout(null);
+        panelCompanyTable.setBackground(new java.awt.Color(37, 46, 65));
+        panelCompanyTable.setForeground(new java.awt.Color(249, 231, 231));
+        panelCompanyTable.setLayout(null);
 
         jTable_company.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -197,89 +205,166 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
             new String [] {
                 "Company ID", "Company Name", "Type"
             }
-        ));
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.String.class, java.lang.String.class
+            };
+            boolean[] canEdit = new boolean [] {
+                false, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable_company.getTableHeader().setResizingAllowed(false);
+        jTable_company.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(jTable_company);
 
-        panelTables.add(jScrollPane1);
-        jScrollPane1.setBounds(10, 60, 560, 120);
+        panelCompanyTable.add(jScrollPane1);
+        jScrollPane1.setBounds(10, 60, 850, 250);
+
+        labelWelcomeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/regStepSideTPO.png"))); // NOI18N
+
+        panelScheduleTable.setBackground(new java.awt.Color(37, 46, 65));
+        panelScheduleTable.setForeground(new java.awt.Color(249, 231, 231));
+        panelScheduleTable.setLayout(null);
 
         jTable_schedule.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
             new String [] {
-                "Schedule ID", "Schedule Date", "Company ID", "Company", "Criteria", "Min Salary"
+                "Schedule ID", "Schedule Date", "Company ID", "Company Name", "Criteria", "Min Salary"
             }
-        ));
-        jScrollPane3.setViewportView(jTable_schedule);
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, false, false
+            };
 
-        panelTables.add(jScrollPane3);
-        jScrollPane3.setBounds(10, 200, 560, 118);
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable_schedule.getTableHeader().setResizingAllowed(false);
+        jTable_schedule.getTableHeader().setReorderingAllowed(false);
+        jScrollPane2.setViewportView(jTable_schedule);
 
-        labelWelcomeIcon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/regStepSideTPO.png"))); // NOI18N
+        panelScheduleTable.add(jScrollPane2);
+        jScrollPane2.setBounds(10, 60, 850, 250);
 
-        jLayeredPane1.setLayer(panelTables, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(panelCompanyTable, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane1.setLayer(labelWelcomeIcon, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(panelScheduleTable, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
         jLayeredPane1.setLayout(jLayeredPane1Layout);
         jLayeredPane1Layout.setHorizontalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
-                .addGap(180, 180, 180)
-                .addComponent(labelWelcomeIcon)
-                .addContainerGap(233, Short.MAX_VALUE))
+                .addGap(306, 306, 306)
+                .addComponent(labelWelcomeIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 264, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(344, Short.MAX_VALUE))
             .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jLayeredPane1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(panelTables, javax.swing.GroupLayout.PREFERRED_SIZE, 578, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(79, Short.MAX_VALUE)))
+                    .addComponent(panelCompanyTable, javax.swing.GroupLayout.PREFERRED_SIZE, 890, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(panelScheduleTable, javax.swing.GroupLayout.PREFERRED_SIZE, 881, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(21, Short.MAX_VALUE)))
         );
         jLayeredPane1Layout.setVerticalGroup(
             jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jLayeredPane1Layout.createSequentialGroup()
                 .addGap(82, 82, 82)
-                .addComponent(labelWelcomeIcon)
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addComponent(labelWelcomeIcon, javax.swing.GroupLayout.PREFERRED_SIZE, 289, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(29, Short.MAX_VALUE))
             .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jLayeredPane1Layout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(panelTables, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(63, Short.MAX_VALUE)))
+                    .addComponent(panelCompanyTable, javax.swing.GroupLayout.PREFERRED_SIZE, 345, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(43, Short.MAX_VALUE)))
+            .addGroup(jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(panelScheduleTable, javax.swing.GroupLayout.PREFERRED_SIZE, 357, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addContainerGap(31, Short.MAX_VALUE)))
         );
 
         labelTitle.setFont(new java.awt.Font("Dialog", 0, 24)); // NOI18N
         labelTitle.setForeground(new java.awt.Color(255, 255, 255));
         labelTitle.setText("Title");
 
+        tpoIdValue.setForeground(new java.awt.Color(239, 229, 229));
+        tpoIdValue.setText("tpo_id");
+
+        jLabel1.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(237, 223, 223));
+        jLabel1.setText("TPO id :");
+
+        jLabel3.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(237, 223, 223));
+        jLabel3.setText("Department :");
+
+        departIdValue.setForeground(new java.awt.Color(229, 214, 214));
+        departIdValue.setText("dept_Name");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(66, 66, 66)
+                        .addComponent(tpoIdValue))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel3)
+                        .addGap(18, 18, 18)
+                        .addComponent(departIdValue)))
+                .addGap(133, 133, 133))
+            .addGroup(jPanel1Layout.createSequentialGroup()
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 35, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addGap(36, 36, 36)
                     .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 569, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(88, Short.MAX_VALUE)))
+                    .addContainerGap(344, Short.MAX_VALUE)))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(tpoIdValue))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel3)
+                    .addComponent(departIdValue))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLayeredPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(48, Short.MAX_VALUE))
+                .addContainerGap(40, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(jPanel1Layout.createSequentialGroup()
                     .addContainerGap()
                     .addComponent(labelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(428, Short.MAX_VALUE)))
+                    .addContainerGap(456, Short.MAX_VALUE)))
         );
 
         jMenuBar1.setBackground(new java.awt.Color(97, 212, 195));
+        jMenuBar1.setForeground(new java.awt.Color(97, 212, 195));
+        jMenuBar1.setPreferredSize(new java.awt.Dimension(493, 50));
 
         menuCompany.setForeground(new java.awt.Color(37, 46, 65));
         menuCompany.setText("Company");
@@ -321,6 +406,14 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
             }
         });
         menuSchedule.add(menuItemCreateSchedule);
+
+        menuItemDeleteSchedule.setText("Delete schedule");
+        menuItemDeleteSchedule.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemDeleteScheduleActionPerformed(evt);
+            }
+        });
+        menuSchedule.add(menuItemDeleteSchedule);
 
         jMenuBar1.add(menuSchedule);
 
@@ -401,22 +494,17 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         jMenuBar1.add(menuProfile);
 
         menuMore.setForeground(new java.awt.Color(37, 46, 65));
-        menuMore.setText("More..");
+        menuMore.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/logoutButton.gif"))); // NOI18N
+        menuMore.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                menuMoreMouseClicked(evt);
+            }
+        });
         menuMore.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuMoreActionPerformed(evt);
             }
         });
-
-        menuItemLogout.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
-        menuItemLogout.setText("Logout");
-        menuItemLogout.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemLogoutActionPerformed(evt);
-            }
-        });
-        menuMore.add(menuItemLogout);
-
         jMenuBar1.add(menuMore);
 
         setJMenuBar(jMenuBar1);
@@ -425,16 +513,11 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 676, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -452,13 +535,14 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
 
     private void menuItemRegisterCompanyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemRegisterCompanyActionPerformed
         this.setVisible(true);
-        new CompanyJframe().setVisible(true);
+        new RegisterCompanyJframe().setVisible(true);
     }//GEN-LAST:event_menuItemRegisterCompanyActionPerformed
 
     private void menuItemCompanyDetailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCompanyDetailActionPerformed
         showCompanyInJTable();
         labelTitle.setVisible(false);
-        panelTables.setVisible(true);
+        panelCompanyTable.setVisible(true);
+        panelScheduleTable.setVisible(false);
         labelWelcomeIcon.setVisible(false);
     }//GEN-LAST:event_menuItemCompanyDetailActionPerformed
 
@@ -470,7 +554,8 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
     private void menuItemScheduleDetailsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemScheduleDetailsActionPerformed
         showScheduleInJTable();
         labelTitle.setVisible(false);
-        panelTables.setVisible(true);
+        panelCompanyTable.setVisible(false);
+        panelScheduleTable.setVisible(true);
         labelWelcomeIcon.setVisible(false);
     }//GEN-LAST:event_menuItemScheduleDetailsActionPerformed
 
@@ -485,33 +570,40 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
     }//GEN-LAST:event_jmenuItemRegisteredStudentsActionPerformed
 
     private void menuMoreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuMoreActionPerformed
-
+        logout();
     }//GEN-LAST:event_menuMoreActionPerformed
-
-    private void menuItemLogoutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLogoutActionPerformed
+    public void logout() {
         this.dispose();
         try {
             new LoginJframe().setVisible(true);
         } catch (IOException ex) {
             Logger.getLogger(TPOHomePageJframe.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_menuItemLogoutActionPerformed
-
+    }
     private void menuItemRecruitedStudentsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemRecruitedStudentsActionPerformed
         new AlumniJframe(tpoId).setVisible(true);
     }//GEN-LAST:event_menuItemRecruitedStudentsActionPerformed
 
     private void menuItemDepartmentWiseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDepartmentWiseActionPerformed
-        new Report().setVisible(true);
+        new ReportDepartmentWiseJframe().setVisible(true);
     }//GEN-LAST:event_menuItemDepartmentWiseActionPerformed
 
     private void menuItemCompanyWiseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCompanyWiseActionPerformed
-        new ReportJframe().setVisible(true);
+        new ReportCompanywiseJframe().setVisible(true);
     }//GEN-LAST:event_menuItemCompanyWiseActionPerformed
 
     private void menuItemYearWiseActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemYearWiseActionPerformed
         new AlumniJframe(tpoId).setVisible(true);
     }//GEN-LAST:event_menuItemYearWiseActionPerformed
+
+    private void menuMoreMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuMoreMouseClicked
+        logout();
+    }//GEN-LAST:event_menuMoreMouseClicked
+
+    private void menuItemDeleteScheduleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDeleteScheduleActionPerformed
+        // TODO add your handling code here:
+        new DeleteScheduleJFrame().setVisible(true);
+    }//GEN-LAST:event_menuItemDeleteScheduleActionPerformed
 
     /**
      * @param args the command line arguments
@@ -546,25 +638,19 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                // try {
-                //    new TPO_file().setVisible(true);
-                // }// catch (SQLException ex) {
-                //   Logger.getLogger(TPO_file.class.getName()).log(Level.SEVERE, null, ex);
-                // }
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel departIdValue;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLayeredPane jLayeredPane1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPopupMenu jPopupMenu1;
-    private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTable jTable2;
     private javax.swing.JTable jTable_company;
     private javax.swing.JTable jTable_schedule;
     private javax.swing.JMenuItem jmenuItemRegisteredStudents;
@@ -575,9 +661,9 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItemCompanyDetail;
     private javax.swing.JMenuItem menuItemCompanyWise;
     private javax.swing.JMenuItem menuItemCreateSchedule;
+    private javax.swing.JMenuItem menuItemDeleteSchedule;
     private javax.swing.JMenuItem menuItemDepartmentWise;
     private javax.swing.JMenuItem menuItemEdit;
-    private javax.swing.JMenuItem menuItemLogout;
     private javax.swing.JMenuItem menuItemRecruitedStudents;
     private javax.swing.JMenuItem menuItemRegisterCompany;
     private javax.swing.JMenuItem menuItemScheduleDetails;
@@ -588,6 +674,8 @@ public class TPOHomePageJframe extends javax.swing.JFrame {
     private javax.swing.JMenu menuReport;
     private javax.swing.JMenu menuSchedule;
     private javax.swing.JMenu menuStudent;
-    private javax.swing.JPanel panelTables;
+    private javax.swing.JPanel panelCompanyTable;
+    private javax.swing.JPanel panelScheduleTable;
+    private javax.swing.JLabel tpoIdValue;
     // End of variables declaration//GEN-END:variables
 }

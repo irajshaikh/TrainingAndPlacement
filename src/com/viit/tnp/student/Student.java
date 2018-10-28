@@ -7,20 +7,20 @@ package com.viit.tnp.student;
 
 public class Student {
 
-    int studentId, marksFirstYear, marksSecondYear, marksThirdYear, isActive,
-            departmentId, personId;
+    int studentId, isActive, departmentId, personId;
+    float  marksFirstYear, marksSecondYear, marksThirdYear;
     String username, firstName;
-    String date;
+    int academicYear;
 
-    public Student(int personId, int marksFirstYear, int marksSecondYear, int marksThirdYear,
-            int isActive, int departmentId, String date) {
+    public Student(int personId, float marksFirstYear, float marksSecondYear, float marksThirdYear,
+            int isActive, int departmentId, int date) {
         this.personId = personId;
         this.marksFirstYear = marksFirstYear;
         this.marksSecondYear = marksSecondYear;
         this.marksThirdYear = marksThirdYear;
         this.isActive = isActive;
         this.departmentId = departmentId;
-        this.date = date;
+        this.academicYear = date;
     }
 
     public String getFirstName() {
@@ -31,20 +31,20 @@ public class Student {
         this.firstName = firstName;
     }
 
-    
-    public Student(int marksFirstYear, int marksSecondYear, int marksThirdYear,
-            int isActive, int departmentId, String date) {
+    public Student(float marksFirstYear, float marksSecondYear, float marksThirdYear,
+            int isActive, int departmentId, int date) {
         this.marksFirstYear = marksFirstYear;
         this.marksSecondYear = marksSecondYear;
         this.marksThirdYear = marksThirdYear;
         this.isActive = isActive;
         this.departmentId = departmentId;
-        this.date = date;
+        this.academicYear = date;
     }
 
     public Student() {
-        
+
     }
+
     public int getStudentId() {
         return studentId;
     }
@@ -61,7 +61,7 @@ public class Student {
         this.username = username;
     }
 
-    public int getMarksFirstYear() {
+    public float getMarksFirstYear() {
         return marksFirstYear;
     }
 
@@ -69,7 +69,7 @@ public class Student {
         this.marksFirstYear = marksFirstYear;
     }
 
-    public int getMarksSecondYear() {
+    public float getMarksSecondYear() {
         return marksSecondYear;
     }
 
@@ -77,7 +77,7 @@ public class Student {
         this.marksSecondYear = marksSecondYear;
     }
 
-    public int getMarksThirdYear() {
+    public float getMarksThirdYear() {
         return marksThirdYear;
     }
 
@@ -109,12 +109,12 @@ public class Student {
         this.personId = personId;
     }
 
-    public String getDate() {
-        return date;
+    public int getAcademicYear() {
+        return academicYear;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setAcademicYear(int academicYear) {
+        this.academicYear = academicYear;
     }
 
 }

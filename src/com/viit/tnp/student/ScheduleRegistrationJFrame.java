@@ -13,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -32,11 +31,14 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
     DefaultComboBoxModel comboModel;
 
     public ScheduleRegistrationJFrame(int studentId, int departmentId) {
-        initComponents();
         setDefaultCloseOperation(ScheduleRegistrationJFrame.HIDE_ON_CLOSE);
         this.studentId = studentId;
         this.departmentId = departmentId;
         getCompaniesList();
+        initComponents();
+        labelScheduleIdError.setVisible(false);
+        labelSalaryError.setVisible(false);
+        jTable_schedule.getTableHeader().setReorderingAllowed(false);
     }
 
     public void getCompaniesList() {
@@ -47,6 +49,10 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         Statement st;
         ResultSet rs;
         Vector companies = new Vector();
+
+//      Add a default blank entry
+        companies.add("Any");
+
         try {
             st = conn.createStatement();
             rs = st.executeQuery(query1);
@@ -63,22 +69,32 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
     public ArrayList<Schedule> getScheduleList() {
         ArrayList<Schedule> scheduleList = new ArrayList<Schedule>();
 
-        String query1 = "select * from schedule_company_view,TPO where TPO.d_id= '"
+        String companyNameQuery = "", minSalaryQuery = "";
+        String getSchedulesQuery = "select * from schedule_company_view,TPO where TPO.d_id= '"
                 + departmentId + "' and active=1 and TPO.tpo_id = schedule_company_view.tpo_id";
 
-        if (searchCompany.getSelectedItem().toString().length() > 0) {
-            query1 += " and co_name=" + searchCompany.getSelectedItem().toString();
+        if (searchCompany.getSelectedIndex() != 0 && searchCompany.getSelectedItem().toString().length() > 0) {
+            companyNameQuery += " schedule_company_view.co_name = '" + searchCompany.getSelectedItem().toString() + "'";
         }
 
         if (searchMinSalary.getText().length() > 0) {
-            query1 += "and min_salary >= " + Integer.parseInt(searchMinSalary.getText());
+            minSalaryQuery += " min_salary >= " + Integer.parseInt(searchMinSalary.getText());
         }
+
+        if (companyNameQuery.length() != 0 && minSalaryQuery.length() != 0) {
+            getSchedulesQuery += " and " + companyNameQuery + " and " + minSalaryQuery;
+        } else if (companyNameQuery.length() != 0) {
+            getSchedulesQuery += " and " + companyNameQuery;
+        } else if (minSalaryQuery.length() != 0) {
+            getSchedulesQuery += " and " + minSalaryQuery;
+        }
+
         Statement st;
         ResultSet rs;
 
         try {
             st = conn.createStatement();
-            rs = st.executeQuery(query1);
+            rs = st.executeQuery(getSchedulesQuery);
             Schedule user;
             while (rs.next()) {
                 user = new Schedule(rs.getInt("sch_id"),
@@ -134,7 +150,7 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         searchCompany = new javax.swing.JComboBox<>();
         jLabel3 = new javax.swing.JLabel();
-        jTextField_sch_id1 = new javax.swing.JTextField();
+        textFieldSchId = new javax.swing.JTextField();
         registerButtonPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         searchButtonPanel = new javax.swing.JPanel();
@@ -143,6 +159,8 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         jSeparator4 = new javax.swing.JSeparator();
         checkButtonPanel1 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
+        labelScheduleIdError = new javax.swing.JLabel();
+        labelSalaryError = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Register for schedule");
@@ -154,13 +172,20 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         scheduleIdLabel.setForeground(java.awt.Color.white);
         scheduleIdLabel.setText("Schedule ID :");
         jPanel2.add(scheduleIdLabel);
-        scheduleIdLabel.setBounds(110, 450, 190, 30);
+        scheduleIdLabel.setBounds(180, 450, 130, 30);
 
         searchMinSalary.setBackground(new java.awt.Color(37, 46, 65));
         searchMinSalary.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         searchMinSalary.setForeground(java.awt.Color.white);
+        searchMinSalary.setBorder(null);
+        searchMinSalary.setCaretColor(java.awt.Color.white);
+        searchMinSalary.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                searchMinSalaryKeyReleased(evt);
+            }
+        });
         jPanel2.add(searchMinSalary);
-        searchMinSalary.setBounds(610, 80, 145, 30);
+        searchMinSalary.setBounds(650, 70, 145, 30);
 
         jTable_schedule.setBackground(new java.awt.Color(36, 47, 65));
         jTable_schedule.setForeground(new java.awt.Color(255, 255, 255));
@@ -179,34 +204,40 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
 
         jLabel1.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Search schedules:");
+        jLabel1.setText("Search schedules");
         jPanel2.add(jLabel1);
-        jLabel1.setBounds(50, 20, 270, 22);
+        jLabel1.setBounds(290, 20, 270, 22);
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel2.setForeground(java.awt.Color.white);
         jLabel2.setText("Company name: ");
         jPanel2.add(jLabel2);
-        jLabel2.setBounds(70, 82, 151, 30);
+        jLabel2.setBounds(50, 60, 151, 30);
 
-        searchCompany.setBackground(new java.awt.Color(37, 46, 65));
         searchCompany.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        searchCompany.setForeground(java.awt.Color.white);
         searchCompany.setModel(comboModel);
+        searchCompany.setBorder(null);
         jPanel2.add(searchCompany);
-        searchCompany.setBounds(250, 80, 48, 32);
+        searchCompany.setBounds(220, 60, 180, 32);
 
         jLabel3.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel3.setForeground(java.awt.Color.white);
         jLabel3.setText("Minimum salary:");
         jPanel2.add(jLabel3);
-        jLabel3.setBounds(440, 80, 146, 30);
+        jLabel3.setBounds(470, 70, 146, 30);
 
-        jTextField_sch_id1.setBackground(new java.awt.Color(37, 46, 65));
-        jTextField_sch_id1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        jTextField_sch_id1.setForeground(java.awt.Color.white);
-        jPanel2.add(jTextField_sch_id1);
-        jTextField_sch_id1.setBounds(330, 450, 145, 30);
+        textFieldSchId.setBackground(new java.awt.Color(37, 46, 65));
+        textFieldSchId.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        textFieldSchId.setForeground(java.awt.Color.white);
+        textFieldSchId.setBorder(null);
+        textFieldSchId.setCaretColor(java.awt.Color.white);
+        textFieldSchId.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                textFieldSchIdKeyReleased(evt);
+            }
+        });
+        jPanel2.add(textFieldSchId);
+        textFieldSchId.setBounds(330, 450, 145, 30);
 
         registerButtonPanel.setBackground(new java.awt.Color(97, 212, 195));
         registerButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -238,7 +269,7 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         );
 
         jPanel2.add(registerButtonPanel);
-        registerButtonPanel.setBounds(350, 500, 120, 45);
+        registerButtonPanel.setBounds(330, 520, 120, 45);
 
         searchButtonPanel.setBackground(new java.awt.Color(97, 212, 195));
         searchButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -274,7 +305,7 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         jPanel2.add(jSeparator3);
         jSeparator3.setBounds(330, 480, 150, 10);
         jPanel2.add(jSeparator4);
-        jSeparator4.setBounds(610, 110, 150, 10);
+        jSeparator4.setBounds(650, 100, 150, 10);
 
         checkButtonPanel1.setBackground(new java.awt.Color(97, 212, 195));
         checkButtonPanel1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -308,6 +339,18 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         jPanel2.add(checkButtonPanel1);
         checkButtonPanel1.setBounds(520, 440, 180, 45);
 
+        labelScheduleIdError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelScheduleIdError.setForeground(new java.awt.Color(230, 49, 29));
+        labelScheduleIdError.setText("scheduleError");
+        jPanel2.add(labelScheduleIdError);
+        labelScheduleIdError.setBounds(330, 480, 270, 21);
+
+        labelSalaryError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelSalaryError.setForeground(new java.awt.Color(230, 49, 29));
+        labelSalaryError.setText("minSalaryError");
+        jPanel2.add(labelSalaryError);
+        labelSalaryError.setBounds(570, 110, 270, 21);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -323,22 +366,40 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void registerForSchedule() {
+        checkEligibility();
         if (isEligible) {
-            String query = "Insert into appearing(stu_id,sch_id,appearing_date)"
-                    + " values('" + studentId + "','"
-                    + searchMinSalary.getText() + "','" + scheduleDateString + "')";
-
-            Statement st = null;
+//            Check if student has alredy registered for schedule
+            boolean alreadyRegistered = true;
+            String scheduleId = textFieldSchId.getText();
+            String isStudentRegisteredQuery = "select * from appearing where "
+                    + "stu_id=" + studentId + " and sch_id=" + scheduleId;
             try {
-                st = conn.createStatement();
-                st.executeUpdate(query);
-                JOptionPane.showMessageDialog(null, "Registration successful!");
-                this.dispose();
+                ResultSet rs = MySqlConnect.executeSelectSQlQuery(isStudentRegisteredQuery);
+                if (!rs.isBeforeFirst()) {
+                    alreadyRegistered = false;
+                }
             } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "Unable to register", "Error", JOptionPane.ERROR_MESSAGE);
                 e.printStackTrace();
             }
 
+            if (!alreadyRegistered) {
+                String query = "Insert into appearing(stu_id,sch_id,appearing_date)"
+                        + " values('" + studentId + "','"
+                        + scheduleId + "','" + scheduleDateString + "')";
+
+                Statement st = null;
+                try {
+                    st = conn.createStatement();
+                    st.executeUpdate(query);
+                    JOptionPane.showMessageDialog(null, "Registration successful!");
+                    this.dispose();
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(null, "Unable to register", "Error", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "You have already registered for this schedule!");
+            }
         } else {
             JOptionPane.showMessageDialog(null,
                     "You're not eligible for the schedule!", "Error",
@@ -346,51 +407,109 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
         }
     }
     private void registerButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_registerButtonPanelMouseClicked
-        registerForSchedule();
+        if (validateScheduleId()) {
+            registerForSchedule();
+        }
     }//GEN-LAST:event_registerButtonPanelMouseClicked
 
+
     private void searchButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_searchButtonPanelMouseClicked
-        showScheduleTable();
+        if (validateMinSalary()) {
+            showScheduleTable();
+        }
     }//GEN-LAST:event_searchButtonPanelMouseClicked
 
-    private void checkButtonPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkButtonPanel1MouseClicked
-        int sch_id = Integer.parseInt(jTextField_sch_id1.getText());
-        PreparedStatement pst = null;
-        ResultSet rs = null;
-        CallableStatement cst = null;
-        try {
+    public void checkEligibility() {
+        if (validateScheduleId()) {
+            int sch_id = Integer.parseInt(textFieldSchId.getText());
+            PreparedStatement pst = null;
+            ResultSet rs = null;
+            CallableStatement cst = null;
+            try {
 
 //            Get schedule details
-            String queryGetScheduleDetails = "SELECT criteria,sch_date from schedule where sch_id='" + sch_id + "'";
-            pst = conn.prepareStatement(queryGetScheduleDetails);
-            rs = pst.executeQuery(queryGetScheduleDetails);
-            rs.next();
-            int criteria = rs.getInt(1);
-            scheduleDateString = rs.getDate(2).toString();          //taking the criteria of the schedule
-            JOptionPane.showMessageDialog(null, "Your schedule criteria is : " + criteria);
+                String queryGetScheduleDetails = "SELECT criteria,sch_date from schedule where sch_id='" + sch_id + "'";
+                pst = conn.prepareStatement(queryGetScheduleDetails);
+                rs = pst.executeQuery(queryGetScheduleDetails);
+                rs.next();
+                int criteria = rs.getInt(1);
+                scheduleDateString = rs.getDate(2).toString();          //taking the criteria of the schedule
 
 //            Check whether student is eligible
-            String callIsEligible = "{call IsEligible(?,?,?)}";
-            cst = conn.prepareCall(callIsEligible);
-            cst.setInt(1, studentId);
-            cst.setInt(2, criteria);
-            cst.registerOutParameter(3, java.sql.Types.INTEGER);
-            cst.execute();
+                String callIsEligible = "{call IsEligible(?,?,?)}";
+                cst = conn.prepareCall(callIsEligible);
+                cst.setInt(1, studentId);
+                cst.setInt(2, criteria);
+                cst.registerOutParameter(3, java.sql.Types.INTEGER);
+                cst.execute();
 
-            int valueReturnedFromProcedure = cst.getInt(3);
+                int valueReturnedFromProcedure = cst.getInt(3);
 
-            if (valueReturnedFromProcedure == 1) {
-                isEligible = true;
-                JOptionPane.showMessageDialog(null, "You are eligible for the schedule");
-            } else {
-                isEligible = false;
-                JOptionPane.showMessageDialog(null, "You're not eligible for the schedule!", "Error", JOptionPane.ERROR_MESSAGE);
+                if (valueReturnedFromProcedure == 1) {
+                    isEligible = true;
+                } else {
+                    isEligible = false;
+                }
+
+            } catch (SQLException ex) {
+                Logger.getLogger(ScheduleRegistrationJFrame.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+    }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(ScheduleRegistrationJFrame.class.getName()).log(Level.SEVERE, null, ex);
+    private void checkButtonPanel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_checkButtonPanel1MouseClicked
+        checkEligibility();
+        if (isEligible) {
+            JOptionPane.showMessageDialog(null, "You are eligible for the schedule");
+        } else {
+            JOptionPane.showMessageDialog(null, "You're not eligible for the schedule!", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_checkButtonPanel1MouseClicked
+
+    private boolean validateScheduleId() {
+        boolean isValid = true;
+        labelScheduleIdError.setVisible(false);
+        String scheduleInput = textFieldSchId.getText();
+
+        if (scheduleInput.length() == 0) {
+            labelScheduleIdError.setVisible(true);
+            labelScheduleIdError.setText("Required");
+            isValid = false;
+        } else {
+            try {
+                Integer.parseInt(scheduleInput);
+            } catch (Exception e) {
+                isValid = false;
+                labelScheduleIdError.setVisible(true);
+                labelScheduleIdError.setText("Should be integer");
+            }
+        }
+        return isValid;
+    }
+
+    private boolean validateMinSalary() {
+        boolean isValid = true;
+        String salaryInput = searchMinSalary.getText();
+        labelSalaryError.setVisible(false);
+        if (salaryInput.length() != 0) {
+            try {
+                Integer.parseInt(salaryInput);
+            } catch (Exception e) {
+                isValid = false;
+                labelSalaryError.setVisible(true);
+                labelSalaryError.setText("Should be integer");
+            }
+        }
+        return isValid;
+    }
+
+    private void textFieldSchIdKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_textFieldSchIdKeyReleased
+        validateScheduleId();
+    }//GEN-LAST:event_textFieldSchIdKeyReleased
+
+    private void searchMinSalaryKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_searchMinSalaryKeyReleased
+        validateMinSalary();
+    }//GEN-LAST:event_searchMinSalaryKeyReleased
 
     /**
      * @param args the command line arguments
@@ -440,12 +559,14 @@ public class ScheduleRegistrationJFrame extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JTable jTable_schedule;
-    private javax.swing.JTextField jTextField_sch_id1;
+    private javax.swing.JLabel labelSalaryError;
+    private javax.swing.JLabel labelScheduleIdError;
     private javax.swing.JPanel registerButtonPanel;
     private javax.swing.JLabel scheduleIdLabel;
     private javax.swing.JScrollPane scrollPaneScheduleTable;
     private javax.swing.JPanel searchButtonPanel;
     private javax.swing.JComboBox<String> searchCompany;
     private javax.swing.JTextField searchMinSalary;
+    private javax.swing.JTextField textFieldSchId;
     // End of variables declaration//GEN-END:variables
 }

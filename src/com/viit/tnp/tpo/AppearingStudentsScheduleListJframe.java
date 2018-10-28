@@ -29,6 +29,7 @@ public class AppearingStudentsScheduleListJframe extends javax.swing.JFrame {
      */
     public AppearingStudentsScheduleListJframe(Integer tpo) {
         initComponents();
+        jTable_schedule.getTableHeader().setReorderingAllowed(false);
         setDefaultCloseOperation(AppearingStudentsScheduleListJframe.HIDE_ON_CLOSE);
         tpo_id = tpo;
         conn = MySqlConnect.getConnection();
@@ -96,6 +97,7 @@ public class AppearingStudentsScheduleListJframe extends javax.swing.JFrame {
         jTable_schedule = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Appearing students");
 
         jPanel2.setBackground(new java.awt.Color(36, 47, 65));
         jPanel2.setLayout(null);

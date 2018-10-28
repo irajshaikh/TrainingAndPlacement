@@ -23,7 +23,8 @@ public class MySqlConnect {
     private static Connection connectDB() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            Connection dbConn = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/TNP?useSSL=false", "tnp-admin", "Password@18");
+            Connection dbConn = DriverManager.getConnection(
+                    "jdbc:mysql://127.0.0.1:3306/old?useSSL=false", "tnp-admin", "Password@18");
             return dbConn;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -34,7 +35,9 @@ public class MySqlConnect {
     public static boolean executeUpdateSQlQuery(String query) {
         Statement st;
         try {
-            st = getConnection().createStatement();
+            
+            Connection connection = getConnection();
+            st = connection.createStatement();
             if ((st.executeUpdate(query)) == 1) {
 //                Query executed successfully
                 return true;

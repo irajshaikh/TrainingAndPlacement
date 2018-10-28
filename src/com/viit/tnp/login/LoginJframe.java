@@ -69,10 +69,10 @@ public class LoginJframe extends javax.swing.JFrame {
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Login as");
 
-        jComboBox_option.setBackground(new java.awt.Color(36, 47, 65));
-        jComboBox_option.setForeground(new java.awt.Color(255, 255, 255));
+        jComboBox_option.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jComboBox_option.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "TPO", "Student" }));
         jComboBox_option.setBorder(null);
+        jComboBox_option.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
 
         jLabel1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -82,6 +82,7 @@ public class LoginJframe extends javax.swing.JFrame {
         jTextField_username.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_username.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_username.setBorder(null);
+        jTextField_username.setCaretColor(java.awt.Color.white);
 
         jLabel2.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
@@ -91,10 +92,11 @@ public class LoginJframe extends javax.swing.JFrame {
         jPasswordField_password.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jPasswordField_password.setForeground(new java.awt.Color(255, 255, 255));
         jPasswordField_password.setBorder(null);
+        jPasswordField_password.setCaretColor(java.awt.Color.white);
 
         jLabel4.setFont(new java.awt.Font("Dialog", 1, 20)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel4.setText("Training and Pacement Cell");
+        jLabel4.setText("Training and Placement Cell");
 
         jSeparator1.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator1.setForeground(new java.awt.Color(255, 255, 255));
@@ -151,27 +153,27 @@ public class LoginJframe extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(26, 26, 26)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jSeparator2)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(registerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jSeparator3)))
-                    .addComponent(loginButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 325, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabel2)
-                            .addComponent(jPasswordField_password)
                             .addComponent(jLabel1)
-                            .addComponent(jTextField_username)
                             .addGroup(jPanel1Layout.createSequentialGroup()
                                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(18, 18, 18)
                                 .addComponent(jComboBox_option, javax.swing.GroupLayout.PREFERRED_SIZE, 172, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 338, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
+                            .addComponent(jTextField_username)))
+                    .addComponent(loginButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPasswordField_password))
                 .addContainerGap(66, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -179,7 +181,7 @@ public class LoginJframe extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(33, 33, 33)
                 .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 18, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(jComboBox_option, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -195,7 +197,7 @@ public class LoginJframe extends javax.swing.JFrame {
                 .addComponent(jPasswordField_password, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(45, 45, 45)
+                .addGap(61, 61, 61)
                 .addComponent(loginButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -232,12 +234,13 @@ public class LoginJframe extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 835, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 835, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 504, javax.swing.GroupLayout.PREFERRED_SIZE)
         );
 
         pack();
@@ -266,7 +269,7 @@ public class LoginJframe extends javax.swing.JFrame {
             rs = pst.executeQuery();
             if (rs.next()) {
                 if (jComboBox_option.getSelectedItem() == "TPO") {
-                    if (rs.getInt(3) == 1) {
+                    if (rs.getInt("id") == 1) {
                         this.dispose();
                         new TPOHomePageJframe(jTextField_username.getText()).setVisible(true);
                     } else {
@@ -274,7 +277,7 @@ public class LoginJframe extends javax.swing.JFrame {
                     }
                     jComboBox_option.requestFocusInWindow();
                 } else if (jComboBox_option.getSelectedItem() == "Student") {
-                    if (rs.getInt(3) == 0) {
+                    if (rs.getInt("id") == 0) {
                         this.dispose();
                         new StudentHomePageJframe(jTextField_username.getText()).setVisible(true);
                     } else {
@@ -286,7 +289,7 @@ public class LoginJframe extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Invalid username or password", "Access denied", JOptionPane.ERROR_MESSAGE);
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, e);
+            e.printStackTrace();
         }
 
     }
@@ -302,11 +305,12 @@ public class LoginJframe extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("WebLookAndFeel".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
             }
+            javax.swing.UIManager.put("Table.reorderingAllowed", false);
         } catch (ClassNotFoundException ex) {
             java.util.logging.Logger.getLogger(LoginJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {

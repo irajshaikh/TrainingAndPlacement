@@ -7,8 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.table.DefaultTableModel;
 
 public class AlumniJframe extends javax.swing.JFrame {
@@ -17,7 +15,6 @@ public class AlumniJframe extends javax.swing.JFrame {
     PreparedStatement pst = null;
     ResultSet rs = null;
     int year;
-    String year1;
     int tpo_id;
     int dep_id;
 
@@ -25,9 +22,10 @@ public class AlumniJframe extends javax.swing.JFrame {
         initComponents();
         setDefaultCloseOperation(AlumniJframe.HIDE_ON_CLOSE);
         tpo_id = tpo;
+        jTable_alumni.getTableHeader().setReorderingAllowed(false);
     }
 
-    public ArrayList<Alumni> getAlumniList(String year) {
+    public ArrayList<Alumni> getAlumniList(int year) {
         ArrayList<Alumni> alumniList = new ArrayList<Alumni>();
 
         String query = "select cand_id,fname,schedule_company_view.co_name,"
@@ -35,19 +33,14 @@ public class AlumniJframe extends javax.swing.JFrame {
                 + "from candidate,student,person,schedule_company_view"
                 + " where candidate.stu_id=student.stu_id and"
                 + " schedule_company_view.sch_id=candidate.sch_id and person.p_id=student.p_id "
-                + "and year(academic_year)='" + year + "'";
+                + "and academic_year=" + year;
 
         Statement st;
         ResultSet rs = null;
 
         try {
             st = conn.createStatement();
-            String cba = jComboBox1.getSelectedItem().toString();
-            if (cba == "2010" || cba == "2011" || cba == "2012"
-                    || cba == "2013" || cba == "2014" || cba == "2015"
-                    || cba == "2016" || cba == "2017") {
-                rs = st.executeQuery(query);
-            }
+            rs = st.executeQuery(query);
 
             Alumni alumni;
             while (rs.next()) {
@@ -64,12 +57,12 @@ public class AlumniJframe extends javax.swing.JFrame {
         return alumniList;
     }
 
-    public void ShowAlumniByYear(String year) {
+    public void ShowAlumniByYear(int year) {
         ArrayList<Alumni> list1 = getAlumniList(year);
         DefaultTableModel model = (DefaultTableModel) jTable_alumni.getModel();
         Object[] row = new Object[7];
         model.getDataVector().removeAllElements();
-        model.fireTableDataChanged();
+        model.fireTableDataChanged();    //refresh the table
         for (int i = 0; i < list1.size(); i++) {
             row[0] = list1.get(i).getCandidateId();
             row[1] = list1.get(i).getName();
@@ -161,9 +154,8 @@ public class AlumniJframe extends javax.swing.JFrame {
         jPanel2.add(jLabel1);
         jLabel1.setBounds(90, 30, 230, 29);
 
-        jComboBox1.setBackground(new java.awt.Color(36, 47, 65));
-        jComboBox1.setForeground(java.awt.Color.white);
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017" }));
+        jComboBox1.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "2016", "2017", "2018", "2019", "2020" }));
         jComboBox1.setToolTipText("");
         jComboBox1.setBorder(null);
         jComboBox1.addActionListener(new java.awt.event.ActionListener() {
@@ -239,8 +231,7 @@ public class AlumniJframe extends javax.swing.JFrame {
 
     private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
         year = Integer.parseInt(jComboBox1.getSelectedItem().toString());
-        year1 = (jComboBox1.getSelectedItem().toString());
-        ShowAlumniByYear(year1);
+        ShowAlumniByYear(year);
     }//GEN-LAST:event_jComboBox1ActionPerformed
 
     private void loginButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginButtonPanelMouseClicked

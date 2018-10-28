@@ -12,20 +12,43 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Vector;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.DefaultTableModel;
 
-public class ReportJframe extends javax.swing.JFrame {
+public class ReportCompanywiseJframe extends javax.swing.JFrame {
 
     /**
      * Creates new form Report
      */
     String selectedYear = "";
+    DefaultComboBoxModel comboModel;
 
-    public ReportJframe() {
+    public ReportCompanywiseJframe() {
+        getCompaniesList();
         initComponents();
-        setDefaultCloseOperation(ReportJframe.HIDE_ON_CLOSE);
+        setDefaultCloseOperation(ReportCompanywiseJframe.HIDE_ON_CLOSE);
+    }
+
+    public void getCompaniesList() {
+
+        String query1 = "select distinct(co_name) from company";
+
+        Statement st;
+        ResultSet rs;
+        Vector companyNames = new Vector();
+
+        try {
+            st = MySqlConnect.getConnection().createStatement();
+            rs = st.executeQuery(query1);
+
+            while (rs.next()) {
+                companyNames.add(rs.getString("co_name"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        comboModel = new DefaultComboBoxModel(companyNames);
     }
 
     public ArrayList<ReportStudentCountYear> getStudentList(String year) {
@@ -36,29 +59,25 @@ public class ReportJframe extends javax.swing.JFrame {
 
         Statement st;
         ResultSet rs = null;
-        ResultSet rs1;
         try {
             st = connection.createStatement();
-            String abc = "All";
-            String cba = comboBoxYear.getSelectedItem().toString();
-            if (cba == "2010" || cba == "2011" || cba == "2012"
-                    || cba == "2013" || cba == "2014" || cba == "2015"
-                    || cba == "2016" || cba == "2017") {
-                yearQuery = "and schedule_company_view.acad_year='" + year
+            if (!year.equals("All")) {
+                yearQuery = "and schedule.acad_year='" + year
                         + "'";
 
-            } else if (cba == "All") {
-                yearQuery = "";
             }
-            String query = "select count(cand_id),schedule_company_view.co_name from candidate,"
-                    + "company,schedule_company_view where candidate.sch_id=schedule_company_view.sch_id and "
-                    + "schedule_company_view.comp_id=company.comp_id " + yearQuery + " group by schedule_company_view.co_name;";
+            String query = "select count(cand_id),schedule_company_view.co_name"
+                    + " from candidate,schedule,schedule_company_view "
+                    + "where candidate.sch_id=schedule_company_view.sch_id "
+                    + yearQuery + " and schedule.sch_id=schedule_company_view.sch_id "
+                    + " group by schedule_company_view.co_name;";
 
             rs = st.executeQuery(query);
 
             ReportStudentCountYear user;
             while (rs.next()) {
-                user = new ReportStudentCountYear(rs.getInt("count(cand_id)"), rs.getString("sch.co_name"));//
+                user = new ReportStudentCountYear(rs.getInt("count(cand_id)"),
+                        rs.getString("schedule_company_view.co_name"));//
 
                 studentList.add(user);
             }
@@ -127,7 +146,7 @@ public class ReportJframe extends javax.swing.JFrame {
         jScrollPane2.setViewportView(jTable2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Report");
+        setTitle("Company statistics");
 
         jPanel1.setBackground(new java.awt.Color(36, 47, 65));
         jPanel1.setLayout(null);
@@ -148,10 +167,9 @@ public class ReportJframe extends javax.swing.JFrame {
         jPanel1.add(jScrollPane1);
         jScrollPane1.setBounds(100, 90, 600, 80);
 
-        comboBoxYear.setBackground(new java.awt.Color(36, 47, 65));
         comboBoxYear.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        comboBoxYear.setForeground(java.awt.Color.white);
-        comboBoxYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017" }));
+        comboBoxYear.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "All", "2016", "2017", "2018", "2019", "2020" }));
+        comboBoxYear.setBorder(null);
         comboBoxYear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxYearActionPerformed(evt);
@@ -183,26 +201,25 @@ public class ReportJframe extends javax.swing.JFrame {
         jTextField_min.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_min.setForeground(java.awt.Color.white);
         jPanel1.add(jTextField_min);
-        jTextField_min.setBounds(70, 390, 110, 30);
+        jTextField_min.setBounds(70, 390, 150, 30);
 
         jTextField_max.setEditable(false);
         jTextField_max.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_max.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_max.setForeground(java.awt.Color.white);
         jPanel1.add(jTextField_max);
-        jTextField_max.setBounds(340, 390, 140, 30);
+        jTextField_max.setBounds(340, 390, 160, 30);
 
-        comboBoxCompany.setBackground(new java.awt.Color(36, 47, 65));
         comboBoxCompany.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
-        comboBoxCompany.setForeground(java.awt.Color.white);
-        comboBoxCompany.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Oracle", "Persistent", "Infosys" }));
+        comboBoxCompany.setModel(comboModel);
+        comboBoxCompany.setBorder(null);
         comboBoxCompany.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 comboBoxCompanyActionPerformed(evt);
             }
         });
         jPanel1.add(comboBoxCompany);
-        comboBoxCompany.setBounds(420, 270, 110, 30);
+        comboBoxCompany.setBounds(420, 270, 220, 30);
 
         jLabel5.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
@@ -251,11 +268,15 @@ public class ReportJframe extends javax.swing.JFrame {
     }//GEN-LAST:event_comboBoxYearActionPerformed
 
     public void showCompanyStats() {
+        jTextField_min.setText("");
+        jTextField_max.setText("");
+        jTextField_total.setText("");
+
         String comp;
         comp = comboBoxCompany.getSelectedItem().toString();
         String query = "select min(package),max(package),count(cand_id)"
-                + " from candidate,company,sch where candidate.sch_id=sch.sch_id "
-                + "and company.comp_id=sch.comp_id and company.co_name='" + comp
+                + " from candidate,company,schedule_company_view where candidate.sch_id=schedule_company_view.sch_id "
+                + "and company.comp_id=schedule_company_view.comp_id and company.co_name='" + comp
                 + "'group by company.comp_id;";
         Connection conn = MySqlConnect.getConnection();
         PreparedStatement ps;
@@ -268,7 +289,7 @@ public class ReportJframe extends javax.swing.JFrame {
                 jTextField_total.setText(rs.getString("count(cand_id)").toString());
             }
         } catch (SQLException ex) {
-            Logger.getLogger(ReportJframe.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
     }
 
@@ -293,21 +314,23 @@ public class ReportJframe extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(ReportJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReportCompanywiseJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(ReportJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReportCompanywiseJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(ReportJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReportCompanywiseJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(ReportJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(ReportCompanywiseJframe.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
+        //</editor-fold>
         //</editor-fold>
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new ReportJframe().setVisible(true);
+                new ReportCompanywiseJframe().setVisible(true);
             }
         });
     }

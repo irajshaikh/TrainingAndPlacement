@@ -69,22 +69,16 @@
         </Component>
         <Component class="javax.swing.JComboBox" name="jComboBox1">
           <Properties>
-            <Property name="background" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="41" green="2f" red="24" type="rgb"/>
-            </Property>
-            <Property name="foreground" type="java.awt.Color" editor="org.netbeans.beaninfo.editors.ColorEditor">
-              <Color blue="ff" green="ff" id="white" palette="1" red="ff" type="palette"/>
+            <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+              <Font name="Dialog" size="18" style="0"/>
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="8">
-                <StringItem index="0" value="2010"/>
-                <StringItem index="1" value="2011"/>
-                <StringItem index="2" value="2012"/>
-                <StringItem index="3" value="2013"/>
-                <StringItem index="4" value="2014"/>
-                <StringItem index="5" value="2015"/>
-                <StringItem index="6" value="2016"/>
-                <StringItem index="7" value="2017"/>
+              <StringArray count="5">
+                <StringItem index="0" value="2016"/>
+                <StringItem index="1" value="2017"/>
+                <StringItem index="2" value="2018"/>
+                <StringItem index="3" value="2019"/>
+                <StringItem index="4" value="2020"/>
               </StringArray>
             </Property>
             <Property name="toolTipText" type="java.lang.String" value=""/>

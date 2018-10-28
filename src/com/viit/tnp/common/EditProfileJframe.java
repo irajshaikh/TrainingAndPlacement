@@ -5,33 +5,111 @@
  */
 package com.viit.tnp.common;
 
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+
 
 public class EditProfileJframe extends javax.swing.JFrame {
 
     Connection conn = MySqlConnect.getConnection();
     PreparedStatement pst = null;
     ResultSet rs = null;
+    String filePath = "", pincode = "", mobileNo = "", email = "", city = "",
+            street = "", flatNo = "";
 
     Integer pid;
 
     public EditProfileJframe(Integer p_id) throws SQLException {
         initComponents();
-        setDefaultCloseOperation(EditProfileJframe.HIDE_ON_CLOSE);
+        
         pid = p_id;
+        labelPincodeError.setVisible(false);
+        labelEmailError.setVisible(false);
+        labelPhoneError.setVisible(false);
+                
         display_person();
+    }
+
+    public boolean validatePincode() {
+        boolean isValidPincode = (pincode.length() == 6
+                && pincode.matches("^[1-9][0-9]{5}$")) || pincode.length() == 0;
+        if (!isValidPincode) {
+            labelPincodeError.setText("Invalid pincode");
+            labelPincodeError.setVisible(true);
+        } else {
+            labelPincodeError.setVisible(false);
+        }
+        return isValidPincode;
+    }
+
+    public boolean validatePhone() {
+        boolean isValidPhone = mobileNo.length() == 10 && mobileNo.matches("[0-9]+");
+        if (!isValidPhone) {
+            if (mobileNo.length() == 0) {
+                labelPhoneError.setText("Phone no is required");
+            } else {
+                labelPhoneError.setText("Invalid phone no");
+            }
+            labelPhoneError.setVisible(true);
+        } else {
+            labelPhoneError.setVisible(false);
+        }
+        return isValidPhone;
+    }
+
+    public boolean validateEmail() {
+        boolean isValidEmail;
+
+        String email_pattern = "^[_A-Za-z0-9]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(\\.[A-Za-z0-9-]+)*(\\.[A-za-z0-9]{2,})$";
+        Pattern pattern = Pattern.compile(email_pattern);
+        Matcher matcher = pattern.matcher(email);
+        isValidEmail = matcher.matches();
+
+        if (!isValidEmail) {
+            if (email.length() == 0) {
+                labelEmailError.setText("Email is required");
+            } else {
+                labelEmailError.setText("Invalid email");
+            }
+            labelEmailError.setVisible(true);
+        } else {
+            labelEmailError.setVisible(false);
+        }
+        return isValidEmail;
+    }
+
+    private boolean validateForm() {
+        boolean isValid = false;
+
+        boolean isValidPincode = validatePincode();
+        boolean isValidEmail = validateEmail();
+        boolean isValidPhone = validatePhone();
+        if (isValidPincode && isValidEmail && isValidPhone) {
+            isValid = true;
+        }
+        return isValid;
     }
 
     public void display_person() throws SQLException {
         String selectSQL = "SELECT fname,lname,email,dob,phone,gender,city,"
-                + "street,flat,pincode from person where p_id=" + pid;
+                + "street,flat,pincode, photo from person where p_id=" + pid;
         PreparedStatement ps = conn.prepareStatement(selectSQL);
         ResultSet rs = ps.executeQuery();
         try {
@@ -45,9 +123,15 @@ public class EditProfileJframe extends javax.swing.JFrame {
                 jTextField_street.setText(rs.getString("street"));
                 jTextField_pincode.setText(rs.getString("pincode"));
 
+                InputStream stream = rs.getBinaryStream("photo");
+                if (stream != null) {
+                    BufferedImage im = ImageIO.read(stream);
+                    ImageIcon ii = new ImageIcon(scaleImage(180, 190, im));
+                    labelProfilePhoto.setIcon(ii);
+                }
             }
-        } catch (SQLException e1) {
-            e1.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             ps.close();
         }
@@ -85,8 +169,17 @@ public class EditProfileJframe extends javax.swing.JFrame {
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
         jSeparator7 = new javax.swing.JSeparator();
-        loginButtonPanel = new javax.swing.JPanel();
+        saveButtonPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        uploadButtonPanel = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        textFieldFileName = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        labelProfilePhoto = new javax.swing.JLabel();
+        jSeparator8 = new javax.swing.JSeparator();
+        labelPincodeError = new javax.swing.JLabel();
+        labelPhoneError = new javax.swing.JLabel();
+        labelEmailError = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Edit profile");
@@ -116,9 +209,10 @@ public class EditProfileJframe extends javax.swing.JFrame {
         jTextField_phone.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_phone.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_phone.setBorder(null);
-        jTextField_phone.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_phoneActionPerformed(evt);
+        jTextField_phone.setCaretColor(java.awt.Color.white);
+        jTextField_phone.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField_phoneKeyReleased(evt);
             }
         });
         jPanel2.add(jTextField_phone);
@@ -128,135 +222,135 @@ public class EditProfileJframe extends javax.swing.JFrame {
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
         jLabel11.setText("Email :");
         jPanel2.add(jLabel11);
-        jLabel11.setBounds(30, 200, 60, 22);
+        jLabel11.setBounds(30, 220, 60, 22);
 
         jTextField_email.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_email.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_email.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_email.setBorder(null);
-        jTextField_email.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_emailActionPerformed(evt);
+        jTextField_email.setCaretColor(java.awt.Color.white);
+        jTextField_email.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField_emailKeyReleased(evt);
             }
         });
         jPanel2.add(jTextField_email);
-        jTextField_email.setBounds(220, 190, 210, 30);
+        jTextField_email.setBounds(220, 220, 210, 30);
 
         jLabel5.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setText("City : ");
         jPanel2.add(jLabel5);
-        jLabel5.setBounds(30, 260, 54, 22);
+        jLabel5.setBounds(30, 300, 54, 22);
 
         jTextField_city.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_city.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_city.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_city.setBorder(null);
+        jTextField_city.setCaretColor(java.awt.Color.white);
         jPanel2.add(jTextField_city);
-        jTextField_city.setBounds(220, 260, 210, 30);
+        jTextField_city.setBounds(220, 300, 210, 30);
 
         jLabel6.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setText("Street :");
         jPanel2.add(jLabel6);
-        jLabel6.setBounds(30, 330, 67, 22);
+        jLabel6.setBounds(30, 370, 67, 22);
 
         jTextField_street.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_street.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_street.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_street.setBorder(null);
+        jTextField_street.setCaretColor(java.awt.Color.white);
         jPanel2.add(jTextField_street);
-        jTextField_street.setBounds(220, 330, 210, 30);
+        jTextField_street.setBounds(220, 370, 210, 30);
 
         jLabel7.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
         jLabel7.setText("Flat No.:");
         jPanel2.add(jLabel7);
-        jLabel7.setBounds(30, 400, 75, 22);
+        jLabel7.setBounds(30, 440, 75, 22);
 
         jTextField_flat.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_flat.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_flat.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_flat.setBorder(null);
-        jTextField_flat.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_flatActionPerformed(evt);
-            }
-        });
+        jTextField_flat.setCaretColor(java.awt.Color.white);
         jPanel2.add(jTextField_flat);
-        jTextField_flat.setBounds(220, 400, 210, 30);
+        jTextField_flat.setBounds(220, 440, 210, 30);
 
         jLabel8.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
         jLabel8.setText("Pincode : ");
         jPanel2.add(jLabel8);
-        jLabel8.setBounds(30, 470, 87, 22);
+        jLabel8.setBounds(30, 520, 87, 22);
 
         jTextField_pincode.setBackground(new java.awt.Color(36, 47, 65));
         jTextField_pincode.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         jTextField_pincode.setForeground(new java.awt.Color(255, 255, 255));
         jTextField_pincode.setBorder(null);
-        jTextField_pincode.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField_pincodeActionPerformed(evt);
+        jTextField_pincode.setCaretColor(java.awt.Color.white);
+        jTextField_pincode.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTextField_pincodeKeyReleased(evt);
             }
         });
         jPanel2.add(jTextField_pincode);
-        jTextField_pincode.setBounds(220, 460, 210, 30);
+        jTextField_pincode.setBounds(220, 520, 210, 30);
 
         labelFirstName.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         labelFirstName.setForeground(java.awt.Color.white);
         labelFirstName.setText("jLabel4");
         jPanel2.add(labelFirstName);
-        labelFirstName.setBounds(210, 50, 63, 22);
+        labelFirstName.setBounds(210, 50, 350, 22);
 
         labelLastName.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
         labelLastName.setForeground(java.awt.Color.white);
         labelLastName.setText("jLabel9");
         jPanel2.add(labelLastName);
-        labelLastName.setBounds(210, 90, 63, 22);
+        labelLastName.setBounds(210, 90, 350, 22);
 
         jSeparator2.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator2.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator2.setBorder(null);
         jPanel2.add(jSeparator2);
-        jSeparator2.setBounds(220, 490, 210, 10);
+        jSeparator2.setBounds(220, 550, 210, 10);
 
         jSeparator3.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator3.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator3.setBorder(null);
         jPanel2.add(jSeparator3);
-        jSeparator3.setBounds(220, 220, 210, 10);
+        jSeparator3.setBounds(220, 250, 210, 10);
 
         jSeparator4.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator4.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator4.setBorder(null);
         jPanel2.add(jSeparator4);
-        jSeparator4.setBounds(220, 290, 210, 10);
+        jSeparator4.setBounds(220, 330, 210, 10);
 
         jSeparator5.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator5.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator5.setBorder(null);
         jPanel2.add(jSeparator5);
-        jSeparator5.setBounds(220, 360, 210, 10);
+        jSeparator5.setBounds(220, 400, 210, 10);
 
         jSeparator6.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator6.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator6.setBorder(null);
         jPanel2.add(jSeparator6);
-        jSeparator6.setBounds(220, 170, 210, 10);
+        jSeparator6.setBounds(680, 400, 210, 10);
 
         jSeparator7.setBackground(new java.awt.Color(36, 47, 65));
         jSeparator7.setForeground(new java.awt.Color(255, 255, 255));
         jSeparator7.setBorder(null);
         jPanel2.add(jSeparator7);
-        jSeparator7.setBounds(220, 430, 210, 10);
+        jSeparator7.setBounds(220, 470, 210, 2);
 
-        loginButtonPanel.setBackground(new java.awt.Color(97, 212, 195));
-        loginButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        loginButtonPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+        saveButtonPanel.setBackground(new java.awt.Color(97, 212, 195));
+        saveButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        saveButtonPanel.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                loginButtonPanelMouseClicked(evt);
+                saveButtonPanelMouseClicked(evt);
             }
         });
 
@@ -264,31 +358,111 @@ public class EditProfileJframe extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(36, 47, 65));
         jLabel4.setText("Save");
 
-        javax.swing.GroupLayout loginButtonPanelLayout = new javax.swing.GroupLayout(loginButtonPanel);
-        loginButtonPanel.setLayout(loginButtonPanelLayout);
-        loginButtonPanelLayout.setHorizontalGroup(
-            loginButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(loginButtonPanelLayout.createSequentialGroup()
+        javax.swing.GroupLayout saveButtonPanelLayout = new javax.swing.GroupLayout(saveButtonPanel);
+        saveButtonPanel.setLayout(saveButtonPanelLayout);
+        saveButtonPanelLayout.setHorizontalGroup(
+            saveButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(saveButtonPanelLayout.createSequentialGroup()
                 .addGap(23, 23, 23)
                 .addComponent(jLabel4)
                 .addContainerGap(27, Short.MAX_VALUE))
         );
-        loginButtonPanelLayout.setVerticalGroup(
-            loginButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, loginButtonPanelLayout.createSequentialGroup()
+        saveButtonPanelLayout.setVerticalGroup(
+            saveButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, saveButtonPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel4)
                 .addContainerGap())
         );
 
-        jPanel2.add(loginButtonPanel);
-        loginButtonPanel.setBounds(510, 540, 90, 45);
+        jPanel2.add(saveButtonPanel);
+        saveButtonPanel.setBounds(830, 540, 90, 45);
+
+        uploadButtonPanel.setBackground(new java.awt.Color(97, 212, 195));
+        uploadButtonPanel.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        uploadButtonPanel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                uploadButtonPanelClicked(evt);
+            }
+        });
+
+        jLabel9.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(36, 47, 65));
+        jLabel9.setText("Upload");
+
+        javax.swing.GroupLayout uploadButtonPanelLayout = new javax.swing.GroupLayout(uploadButtonPanel);
+        uploadButtonPanel.setLayout(uploadButtonPanelLayout);
+        uploadButtonPanelLayout.setHorizontalGroup(
+            uploadButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(uploadButtonPanelLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jLabel9)
+                .addContainerGap(25, Short.MAX_VALUE))
+        );
+        uploadButtonPanelLayout.setVerticalGroup(
+            uploadButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, 30, Short.MAX_VALUE)
+        );
+
+        jPanel2.add(uploadButtonPanel);
+        uploadButtonPanel.setBounds(540, 370, 110, 30);
+
+        textFieldFileName.setBackground(new java.awt.Color(36, 47, 65));
+        textFieldFileName.setFont(new java.awt.Font("Dialog", 0, 18)); // NOI18N
+        textFieldFileName.setForeground(java.awt.Color.white);
+        textFieldFileName.setBorder(null);
+        jPanel2.add(textFieldFileName);
+        textFieldFileName.setBounds(680, 370, 210, 32);
+
+        labelProfilePhoto.setForeground(new java.awt.Color(222, 166, 133));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(labelProfilePhoto, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 180, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(labelProfilePhoto, javax.swing.GroupLayout.PREFERRED_SIZE, 190, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel2.add(jPanel1);
+        jPanel1.setBounds(600, 130, 180, 190);
+
+        jSeparator8.setBackground(new java.awt.Color(36, 47, 65));
+        jSeparator8.setForeground(new java.awt.Color(255, 255, 255));
+        jSeparator8.setBorder(null);
+        jPanel2.add(jSeparator8);
+        jSeparator8.setBounds(220, 170, 210, 2);
+
+        labelPincodeError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelPincodeError.setForeground(new java.awt.Color(230, 49, 29));
+        labelPincodeError.setText("pincodeError");
+        jPanel2.add(labelPincodeError);
+        labelPincodeError.setBounds(220, 560, 340, 21);
+
+        labelPhoneError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelPhoneError.setForeground(new java.awt.Color(230, 49, 29));
+        labelPhoneError.setText("phoneError");
+        jPanel2.add(labelPhoneError);
+        labelPhoneError.setBounds(220, 180, 270, 21);
+
+        labelEmailError.setFont(new java.awt.Font("Ubuntu", 1, 18)); // NOI18N
+        labelEmailError.setForeground(new java.awt.Color(230, 49, 29));
+        labelEmailError.setText("emailError");
+        jPanel2.add(labelEmailError);
+        labelEmailError.setBounds(220, 260, 290, 21);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 940, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -298,38 +472,120 @@ public class EditProfileJframe extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField_phoneActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_phoneActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField_phoneActionPerformed
+    private void save() {
+        PreparedStatement stmt;
+        mobileNo = jTextField_phone.getText();
+        pincode = jTextField_pincode.getText();
+        email = jTextField_email.getText();
+        street = jTextField_street.getText();
+        city = jTextField_city.getText();
+        flatNo = jTextField_flat.getText();
 
-    private void jTextField_flatActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_flatActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField_flatActionPerformed
+        boolean isFormValid = validateForm();
+        if (isFormValid) {
+            try {
+                String query = "update person set email='" + jTextField_email.getText() + "' ";
 
-    private void jTextField_pincodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_pincodeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField_pincodeActionPerformed
+                if (mobileNo != null && mobileNo.length() != 0) {
+                    query += ", phone='" + mobileNo + "'";
+                }
+                if (email != null && email.length() != 0) {
+                    query += ", email='" + email + "'";
+                }
+                if (city != null && city.length() != 0) {
+                    query += ", city='" + city + "'";
+                }
+                if (street != null && street.length() != 0) {
+                    query += ", street='" + street + "'";
+                }
+                if (flatNo != null && flatNo.length() != 0) {
+                    query += ", flat='" + flatNo + "'";
+                }
+                if (pincode != null && pincode.length() != 0) {
+                    query += ", pincode=" + jTextField_pincode.getText();
+                }
 
-    private void jTextField_emailActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField_emailActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField_emailActionPerformed
+                //          Update photo
+                String filePath = textFieldFileName.getText();
+                boolean hasPhoto = filePath != null && filePath.length() != 0;
+                if (hasPhoto) {
+                    query += ", photo=?";
+                }
+                query += " where p_id=" + pid;
+                stmt = conn.prepareStatement(query);
 
-    private void loginButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_loginButtonPanelMouseClicked
-        Statement stmt;
-        try {
-            stmt = (Statement) conn.createStatement();
-            String query = "update person set phone='"
-                    + jTextField_phone.getText()
-                    + "', email='" + jTextField_email.getText() + "', city='"
-                    + jTextField_city.getText() + "', street='"
-                    + jTextField_street.getText() + "', pincode='"
-                    + jTextField_pincode.getText() + "' where p_id='" + pid + "'";
-            stmt.executeUpdate(query);
-            JOptionPane.showMessageDialog(null, "Profile Updated!");
-            this.dispose();
-        } catch (SQLException ex) {
-            Logger.getLogger(EditProfileJframe.class.getName()).log(Level.SEVERE, null, ex);
-        }    }//GEN-LAST:event_loginButtonPanelMouseClicked
+                FileInputStream fin = null;
+                if (hasPhoto) {
+                    try {
+                        File imgfile = new File(filePath);
+                        fin = new FileInputStream(imgfile);
+                        stmt.setBinaryStream(1, (InputStream) fin, (int) imgfile.length());
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                boolean updatedDetails = stmt.executeUpdate() == 1;
+
+                if (updatedDetails) {
+                    JOptionPane.showMessageDialog(null, "Profile Updated!");
+                    this.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(null,
+                            "Failed to update profile", "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (SQLException ex) {
+                Logger.getLogger(EditProfileJframe.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+    private void uploadButtonPanelClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_uploadButtonPanelClicked
+        JFileChooser chooser = new JFileChooser();
+        chooser.showOpenDialog(null);
+        File f = chooser.getSelectedFile();
+        if (f != null) {
+            filePath = f.getAbsolutePath();
+            textFieldFileName.setText(filePath);
+            try {
+                //get the image from file chooser and scale it to match JLabel size
+                ImageIcon ii = new ImageIcon(scaleImage(180, 190, ImageIO.read(new File(f.getAbsolutePath()))));
+                labelProfilePhoto.setIcon(ii);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }//GEN-LAST:event_uploadButtonPanelClicked
+
+    private void jTextField_pincodeKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_pincodeKeyReleased
+        pincode = jTextField_pincode.getText();
+        validatePincode();
+    }//GEN-LAST:event_jTextField_pincodeKeyReleased
+
+    private void saveButtonPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_saveButtonPanelMouseClicked
+        save();
+    }//GEN-LAST:event_saveButtonPanelMouseClicked
+
+    private void jTextField_phoneKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_phoneKeyReleased
+        mobileNo = jTextField_phone.getText();
+        validatePhone();
+    }//GEN-LAST:event_jTextField_phoneKeyReleased
+
+    private void jTextField_emailKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextField_emailKeyReleased
+        email = jTextField_email.getText();
+        validateEmail();
+    }//GEN-LAST:event_jTextField_emailKeyReleased
+
+    public static BufferedImage scaleImage(int w, int h, BufferedImage img) throws Exception {
+        BufferedImage bi;
+        bi = new BufferedImage(w, h, BufferedImage.TRANSLUCENT);
+        Graphics2D g2d = (Graphics2D) bi.createGraphics();
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.addRenderingHints(new RenderingHints(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY));
+        g2d.drawImage(img, 0, 0, w, h, null);
+        g2d.dispose();
+        return bi;
+    }
 
     /**
      * @param args the command line arguments
@@ -378,6 +634,8 @@ public class EditProfileJframe extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -385,14 +643,21 @@ public class EditProfileJframe extends javax.swing.JFrame {
     private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
+    private javax.swing.JSeparator jSeparator8;
     private javax.swing.JTextField jTextField_city;
     private javax.swing.JTextField jTextField_email;
     private javax.swing.JTextField jTextField_flat;
     private javax.swing.JTextField jTextField_phone;
     private javax.swing.JTextField jTextField_pincode;
     private javax.swing.JTextField jTextField_street;
+    private javax.swing.JLabel labelEmailError;
     private javax.swing.JLabel labelFirstName;
     private javax.swing.JLabel labelLastName;
-    private javax.swing.JPanel loginButtonPanel;
+    private javax.swing.JLabel labelPhoneError;
+    private javax.swing.JLabel labelPincodeError;
+    private javax.swing.JLabel labelProfilePhoto;
+    private javax.swing.JPanel saveButtonPanel;
+    private javax.swing.JTextField textFieldFileName;
+    private javax.swing.JPanel uploadButtonPanel;
     // End of variables declaration//GEN-END:variables
 }

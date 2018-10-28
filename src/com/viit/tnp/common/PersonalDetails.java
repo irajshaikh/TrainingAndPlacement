@@ -8,11 +8,11 @@ package com.viit.tnp.common;
 public class PersonalDetails {
 
     String email = "", mobileNo = "", firstName = "", middleName = "",
-            lastName = "", dateOfBirth = "", gender = "", username = "";
+            lastName = "", dateOfBirth = "", gender = "", username = "", absolutePathPhoto;
 
     public PersonalDetails(String firstName, String middleName, String lastName,
             String email, String mobileNo, String gender,
-            String dateOfBirth) {
+            String dateOfBirth, String absolutePathPhoto) {
         this.firstName = firstName;
         this.middleName = middleName;
         this.lastName = lastName;
@@ -20,6 +20,15 @@ public class PersonalDetails {
         this.mobileNo = mobileNo;
         this.dateOfBirth = dateOfBirth;
         this.gender = gender;
+        this.absolutePathPhoto = absolutePathPhoto;
+    }
+
+    public String getAbsolutePathPhoto() {
+        return absolutePathPhoto;
+    }
+
+    public void setAbsolutePathPhoto(String absolutePathPhoto) {
+        this.absolutePathPhoto = absolutePathPhoto;
     }
 
     public PersonalDetails() {
